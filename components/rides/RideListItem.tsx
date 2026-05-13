@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Trophy, Download, Users, Check, X, Star } from 'lucide-react';
 import { formatRideDate, isRegistrationOpen, getDisplayName, cn } from '@/lib/utils';
@@ -104,7 +105,9 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-medium text-white">{ride.title}</h3>
+            <Link href={`/kalender/${ride.id}`} className="text-lg font-medium text-white hover:text-brand-200 transition">
+              {ride.title}
+            </Link>
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-400">
               <span className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />

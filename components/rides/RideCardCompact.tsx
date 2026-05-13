@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Calendar, MapPin, Trophy, Users, Check, Star } from 'lucide-react';
 import { formatRideDate, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
@@ -88,7 +89,9 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       </div>
 
       {/* Titel */}
-      <h3 className={cn('font-medium leading-snug', isTopRit ? 'text-amber-50 text-base' : 'text-white')}>{ride.title}</h3>
+      <Link href={`/kalender/${ride.id}`} className={cn('font-medium leading-snug hover:underline', isTopRit ? 'text-amber-50 text-base' : 'text-white')}>
+        {ride.title}
+      </Link>
 
       {/* Datum + locatie */}
       <div className="space-y-1 text-xs text-ink-400">
