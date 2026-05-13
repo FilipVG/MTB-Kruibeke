@@ -42,19 +42,22 @@ export default async function KlassementPage() {
                 const place = i === 1 ? 1 : i === 0 ? 2 : 3;
                 const heights = { 1: 'h-44', 2: 'h-36', 3: 'h-28' } as const;
                 const colors = {
-                  1: 'bg-brand-700 border-brand-500',
-                  2: 'bg-ink-800 border-ink-600',
-                  3: 'bg-amber-900/50 border-amber-700/50',
+                  1: 'bg-yellow-500/20 border-yellow-400',
+                  2: 'bg-slate-400/20 border-slate-300',
+                  3: 'bg-orange-700/20 border-orange-600',
                 } as const;
                 return (
                   <div key={entry.id} className="text-center">
                     <Avatar entry={entry} size="lg" />
                     <p className="mt-2 text-sm font-medium text-white truncate">{getDisplayName(entry)}</p>
-                    <p className="text-xs text-ink-400">{entry.total_points} pt</p>
+                    <p className={cn('text-xs font-medium', place === 1 ? 'text-yellow-400' : place === 2 ? 'text-slate-300' : 'text-orange-500')}>
+                      {entry.total_points} pt
+                    </p>
                     <div className={cn(
-                      'mt-2 rounded-t-md border-t-2 flex items-center justify-center text-white text-3xl font-semibold',
+                      'mt-2 rounded-t-md border-t-2 flex items-center justify-center text-3xl font-semibold',
                       heights[place as 1 | 2 | 3],
-                      colors[place as 1 | 2 | 3]
+                      colors[place as 1 | 2 | 3],
+                      place === 1 ? 'text-yellow-300' : place === 2 ? 'text-slate-300' : 'text-orange-400'
                     )}>
                       {place}
                     </div>
