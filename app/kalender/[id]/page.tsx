@@ -129,29 +129,31 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
         )}
       </div>
 
-      {/* Ingeschrevenen */}
-      <div className="card p-6 mt-4">
-        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
-          <Users className="h-4 w-4 text-ink-400" />
-          Ingeschreven ({registrations.length})
-        </h2>
-        {registrations.length === 0 ? (
-          <p className="text-sm text-ink-500">Nog niemand ingeschreven.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {registrations.map(reg => (
-              <Link
-                key={reg.id}
-                href={`/leden/${reg.profile.id}`}
-                className="flex items-center gap-2 bg-ink-800 hover:bg-ink-700 rounded-full pl-1 pr-3 py-1 transition"
-              >
-                <Avatar profile={reg.profile} />
-                <span className="text-sm text-ink-200">{getDisplayName(reg.profile)}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Ingeschrevenen — enkel voor ingelogde leden */}
+      {current && (
+        <div className="card p-6 mt-4">
+          <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
+            <Users className="h-4 w-4 text-ink-400" />
+            Ingeschreven ({registrations.length})
+          </h2>
+          {registrations.length === 0 ? (
+            <p className="text-sm text-ink-500">Nog niemand ingeschreven.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {registrations.map(reg => (
+                <Link
+                  key={reg.id}
+                  href={`/leden/${reg.profile.id}`}
+                  className="flex items-center gap-2 bg-ink-800 hover:bg-ink-700 rounded-full pl-1 pr-3 py-1 transition"
+                >
+                  <Avatar profile={reg.profile} />
+                  <span className="text-sm text-ink-200">{getDisplayName(reg.profile)}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

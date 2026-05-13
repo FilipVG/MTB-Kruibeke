@@ -122,10 +122,12 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 <MapPin className="h-3.5 w-3.5" />
                 {ride.start_location}
               </a>
-              <span className="flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5" />
-                {ride.registration_count} ingeschreven
-              </span>
+              {currentUserId && (
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5" />
+                  {ride.registration_count} ingeschreven
+                </span>
+              )}
             </div>
           </div>
 

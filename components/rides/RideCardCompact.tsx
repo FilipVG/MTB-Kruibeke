@@ -82,10 +82,12 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
             )
           )}
         </div>
-        <span className="flex items-center gap-1 text-xs text-ink-500">
-          <Users className="h-3.5 w-3.5" />
-          {ride.registration_count}
-        </span>
+        {currentUserId && (
+          <span className="flex items-center gap-1 text-xs text-ink-500">
+            <Users className="h-3.5 w-3.5" />
+            {ride.registration_count}
+          </span>
+        )}
       </div>
 
       {/* Titel */}
