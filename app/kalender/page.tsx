@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Calendar, Download } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideListItem } from '@/components/rides/RideListItem';
-import type { Ride } from '@/lib/types/database';
+import type { Ride, Profile } from '@/lib/types/database';
 
 export const metadata = { title: 'Kalender — MTB Kruibeke' };
 
@@ -24,7 +24,8 @@ export default async function KalenderPage() {
     .gte('start_at', new Date(Date.now() - 24 * 3600 * 1000).toISOString())
     .order('start_at', { ascending: true });
 
-  const ridesWithMeta = (rides ?? []).map((r: Ride & { registrations: { user_id: string }[] }) => ({
+  type Registration = { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> };
+  const ridesWithMeta = (rides ?? []).map((r: Ride & { registrations: Registration[] }) => ({
     ...r,
     registration_count: r.registrations?.length ?? 0,
     is_registered: current?.user
