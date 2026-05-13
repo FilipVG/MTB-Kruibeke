@@ -108,7 +108,7 @@ export default async function HomePage() {
                 <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-brand-400 font-medium text-center mb-4">
                   Hoofdsponsors
                 </p>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex flex-wrap items-center justify-center gap-3">
                   {mainSponsors.map((sponsor: Sponsor) => (
                     <MainSponsorCard key={sponsor.id} sponsor={sponsor} />
                   ))}
@@ -158,7 +158,7 @@ function MainSponsorCard({ sponsor }: { sponsor: Sponsor }) {
   );
 
   const className =
-    'relative block bg-ink-900/60 border border-brand-700/40 hover:border-brand-600 hover:bg-ink-900 rounded-lg p-5 transition group';
+    'relative block bg-ink-900/60 border border-brand-700/40 hover:border-brand-600 hover:bg-ink-900 rounded-lg p-5 transition group w-48 text-center';
 
   if (sponsor.website_url) {
     return (
