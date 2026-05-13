@@ -57,7 +57,7 @@ export default function LidWordenPage() {
           Of kom gewoon eens een keer mee rijden — kijk op de kalender wanneer de volgende rit is.
         </p>
         <div className="flex flex-wrap gap-3">
-          <a href="mailto:info@mtbkruibeke.be" className="btn-primary">
+          <a href="mailto:mtbkruibeke.unlit879@passmail.net" className="btn-primary">
             Stuur een e-mail
           </a>
           <Link href="/kalender" className="btn-secondary">
