@@ -98,10 +98,15 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 <Calendar className="h-3.5 w-3.5" />
                 {formatRideDate(ride.start_at)}
               </span>
-              <span className="flex items-center gap-1.5">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ride.start_location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-white transition"
+              >
                 <MapPin className="h-3.5 w-3.5" />
                 {ride.start_location}
-              </span>
+              </a>
               <span className="flex items-center gap-1.5">
                 <Users className="h-3.5 w-3.5" />
                 {ride.registration_count} ingeschreven

@@ -89,10 +89,15 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
                 {formatDate(activity.start_at)}
               </span>
               {activity.location && (
-                <span className="flex items-center gap-1.5">
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:text-white transition"
+                >
                   <MapPin className="h-3.5 w-3.5" />
                   {activity.location}
-                </span>
+                </a>
               )}
               {activity.registration_required && (
                 <span className="flex items-center gap-1.5">

@@ -1,19 +1,28 @@
 import Link from 'next/link';
-import { ArrowRight, Calendar, MapPin, Trophy, ExternalLink } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
-import { formatRideDate } from '@/lib/utils';
-import type { Ride, Sponsor } from '@/lib/types/database';
+import { ArrowRight, ExternalLink } from 'lucide-react';
+import { createClient, getCurrentUser } from '@/lib/supabase/server';
+import { RideListItem } from '@/components/rides/RideListItem';
+import type { Ride, Profile, Sponsor } from '@/lib/types/database';
 
 export default async function HomePage() {
   const supabase = await createClient();
+  const current = await getCurrentUser();
+
+  type Registration = { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> };
 
   const { data: upcomingRides } = await supabase
     .from('rides')
-    .select('*')
+    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
     .gte('start_at', new Date().toISOString())
     .eq('cancelled', false)
     .order('start_at', { ascending: true })
     .limit(3);
+
+  const ridesWithMeta = (upcomingRides ?? []).map((r: Ride & { registrations: Registration[] }) => ({
+    ...r,
+    registration_count: r.registrations?.length ?? 0,
+    is_registered: current?.user ? r.registrations?.some(reg => reg.user_id === current.user.id) : false,
+  }));
 
   const { data: sponsors } = await supabase
     .from('sponsors')
@@ -56,21 +65,28 @@ export default async function HomePage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-white">Komende ritten</h2>
-            <p className="text-sm text-ink-400 mt-1">Schrijf je in via de kalender.</p>
+            <p className="text-sm text-ink-400 mt-1">
+              {current ? 'Schrijf je in voor de volgende rit.' : 'Log in om je in te schrijven.'}
+            </p>
           </div>
           <Link href="/kalender" className="text-sm text-brand-400 hover:text-brand-300 hidden sm:flex items-center gap-1">
             Alles bekijken <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        {!upcomingRides?.length ? (
+        {!ridesWithMeta.length ? (
           <div className="card p-8 text-center text-ink-400">
             Nog geen ritten gepland. Bekijk de <Link href="/kalender" className="text-brand-400 hover:underline">kalender</Link>.
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-3">
-            {upcomingRides.map((ride: Ride) => (
-              <RideCard key={ride.id} ride={ride} />
+          <div className="space-y-3">
+            {ridesWithMeta.map(ride => (
+              <RideListItem
+                key={ride.id}
+                ride={ride}
+                currentUserId={current?.user?.id ?? null}
+                isAdmin={current?.profile?.role === 'admin'}
+              />
             ))}
           </div>
         )}
@@ -127,38 +143,6 @@ export default async function HomePage() {
   );
 }
 
-function RideCard({ ride }: { ride: Ride }) {
-  return (
-    <Link href={`/kalender#rit-${ride.id}`} className="card p-5 hover:border-brand-700/50 hover:bg-ink-900/60 transition group">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-xs">
-          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : 'badge-gravel'}>
-            {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
-          </span>
-          {ride.in_ranking && ride.points > 0 && (
-            <span className="badge bg-brand-700/20 text-brand-200 border border-brand-700/30">
-              <Trophy className="h-3 w-3 mr-1" />
-              {ride.points} pt
-            </span>
-          )}
-        </div>
-      </div>
-      <h3 className="font-medium text-white group-hover:text-brand-100 transition">
-        {ride.title}
-      </h3>
-      <div className="mt-3 space-y-1.5 text-sm text-ink-400">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-3.5 w-3.5 shrink-0" />
-          <span>{formatRideDate(ride.start_at)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{ride.start_location}</span>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 function MainSponsorCard({ sponsor }: { sponsor: Sponsor }) {
   const content = (
