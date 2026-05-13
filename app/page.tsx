@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
-import { RideListItem } from '@/components/rides/RideListItem';
+import { RideCardCompact } from '@/components/rides/RideCardCompact';
 import type { Ride, Profile, Sponsor } from '@/lib/types/database';
 
 export default async function HomePage() {
@@ -79,13 +79,12 @@ export default async function HomePage() {
             Nog geen ritten gepland. Bekijk de <Link href="/kalender" className="text-brand-400 hover:underline">kalender</Link>.
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {ridesWithMeta.map(ride => (
-              <RideListItem
+              <RideCardCompact
                 key={ride.id}
                 ride={ride}
                 currentUserId={current?.user?.id ?? null}
-                isAdmin={current?.profile?.role === 'admin'}
               />
             ))}
           </div>
