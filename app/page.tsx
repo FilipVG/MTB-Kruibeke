@@ -47,9 +47,6 @@ export default async function HomePage() {
               Volgende rit bekijken
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/lid-worden" className="btn-secondary border-white/30 text-white hover:bg-white/10">
-              Lid worden
-            </Link>
           </div>
         </div>
       </section>

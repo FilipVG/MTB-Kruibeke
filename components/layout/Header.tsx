@@ -72,12 +72,16 @@ export function Header({ profile }: { profile: Profile | null }) {
               <div className="flex items-center gap-2">
                 <Link
                   href="/profiel"
-                  className="flex items-center gap-2 rounded-md px-3 py-1.5 hover:bg-ink-900 transition"
+                  className="flex items-center gap-2 rounded-md px-3 py-1.5 hover:bg-ink-900 transition border border-ink-800"
                 >
                   <Avatar profile={profile} size="sm" />
-                  <span className="text-sm font-medium text-ink-100">
-                    {profile.nickname || profile.first_name}
-                  </span>
+                  <div className="flex flex-col leading-none">
+                    <span className="text-xs text-ink-400">Mijn profiel</span>
+                    <span className="text-sm font-medium text-ink-100">
+                      {profile.nickname || profile.first_name}
+                    </span>
+                  </div>
+                  <User className="h-3.5 w-3.5 text-ink-500" />
                 </Link>
                 <button onClick={handleLogout} className="btn-ghost" aria-label="Uitloggen">
                   <LogOut className="h-4 w-4" />
@@ -147,14 +151,9 @@ export function Header({ profile }: { profile: Profile | null }) {
                   </button>
                 </>
               ) : (
-                <>
-                  <Link href="/auth/login" className="block btn-secondary text-center">
-                    Inloggen
-                  </Link>
-                  <Link href="/lid-worden" className="block btn-primary text-center">
-                    Lid worden
-                  </Link>
-                </>
+                <Link href="/auth/login" className="block btn-primary text-center">
+                  Inloggen
+                </Link>
               )}
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getInitials } from '@/lib/utils';
+import { AvatarCropper } from './AvatarCropper';
 import type { Profile } from '@/lib/types/database';
 
 export function ProfileForm({ profile }: { profile: Profile }) {
@@ -20,17 +21,25 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     birthdate: profile.birthdate ?? '',
   });
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar_url);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
-  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  async function handleCropDone(blob: Blob) {
+    setCropSrc(null);
     setSaving(true);
     setMessage(null);
-    const ext = file.name.split('.').pop();
-    const path = `${profile.id}/avatar.${ext}`;
+    const path = `${profile.id}/avatar.jpg`;
     const { error } = await supabase.storage
       .from('avatars')
-      .upload(path, file, { upsert: true });
+      .upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
     if (error) {
       setMessage(`Upload mislukt: ${error.message}`);
       setSaving(false);
@@ -58,13 +67,21 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     if (error) {
       setMessage(`Opslaan mislukt: ${error.message}`);
     } else {
-      setMessage('Opgeslagen.');
+      router.push('/leden');
       router.refresh();
     }
     setSaving(false);
   }
 
   return (
+    <>
+    {cropSrc && (
+      <AvatarCropper
+        imageSrc={cropSrc}
+        onCrop={handleCropDone}
+        onCancel={() => setCropSrc(null)}
+      />
+    )}
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Avatar */}
       <div className="card p-6">
@@ -79,7 +96,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             </div>
           )}
           <label className="btn-secondary cursor-pointer">
-            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
             Foto kiezen
           </label>
         </div>
@@ -132,5 +149,6 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         </button>
       </div>
     </form>
+    </>
   );
 }

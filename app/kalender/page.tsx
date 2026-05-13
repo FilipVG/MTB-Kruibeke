@@ -1,16 +1,36 @@
 import Link from 'next/link';
-import { Calendar, Download } from 'lucide-react';
+import { Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideListItem } from '@/components/rides/RideListItem';
 import type { Ride, Profile } from '@/lib/types/database';
 
 export const metadata = { title: 'Kalender — MTB Kruibeke' };
 
-export default async function KalenderPage() {
+const MAANDEN = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni',
+  'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
+
+interface Props {
+  searchParams: Promise<{ maand?: string; jaar?: string }>;
+}
+
+export default async function KalenderPage({ searchParams }: Props) {
   const supabase = await createClient();
   const current = await getCurrentUser();
+  const params = await searchParams;
 
-  // Haal komende ritten op met inschrijvingen
+  const now = new Date();
+  const jaar = parseInt(params.jaar ?? String(now.getFullYear()));
+  const maand = parseInt(params.maand ?? String(now.getMonth() + 1));
+
+  const vanDatum = new Date(jaar, maand - 1, 1).toISOString();
+  const totDatum = new Date(jaar, maand, 1).toISOString();
+
+  // Vorige en volgende maand
+  const vorigeDate = new Date(jaar, maand - 2, 1);
+  const volgendeDate = new Date(jaar, maand, 1);
+  const vorigeLink = `?maand=${vorigeDate.getMonth() + 1}&jaar=${vorigeDate.getFullYear()}`;
+  const volgendeLink = `?maand=${volgendeDate.getMonth() + 1}&jaar=${volgendeDate.getFullYear()}`;
+
   const { data: rides } = await supabase
     .from('rides')
     .select(`
@@ -21,7 +41,8 @@ export default async function KalenderPage() {
         profile:profiles(id, nickname, first_name, last_name, avatar_url)
       )
     `)
-    .gte('start_at', new Date(Date.now() - 24 * 3600 * 1000).toISOString())
+    .gte('start_at', vanDatum)
+    .lt('start_at', totDatum)
     .order('start_at', { ascending: true });
 
   type Registration = { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> };
@@ -56,9 +77,22 @@ export default async function KalenderPage() {
         </Link>
       </div>
 
+      {/* Maandnavigatie */}
+      <div className="flex items-center justify-between mb-6 card px-5 py-3">
+        <Link href={vorigeLink} className="p-1.5 rounded-md hover:bg-ink-800 text-ink-300 hover:text-white transition">
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
+        <h2 className="text-lg font-semibold text-white">
+          {MAANDEN[maand - 1]} {jaar}
+        </h2>
+        <Link href={volgendeLink} className="p-1.5 rounded-md hover:bg-ink-800 text-ink-300 hover:text-white transition">
+          <ChevronRight className="h-5 w-5" />
+        </Link>
+      </div>
+
       {ridesWithMeta.length === 0 ? (
         <div className="card p-12 text-center text-ink-400">
-          Geen geplande ritten op dit moment.
+          Geen ritten gepland in {MAANDEN[maand - 1]} {jaar}.
         </div>
       ) : (
         <div className="space-y-3">
