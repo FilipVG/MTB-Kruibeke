@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, MapPin, Trophy, Download, Users, Check, X } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Download, Users, Check, X, Star } from 'lucide-react';
 import { formatRideDate, isRegistrationOpen, getDisplayName, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types/database';
@@ -37,6 +37,7 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
 
   const canRegister = isRegistrationOpen(ride);
   const isRegistered = ride.is_registered;
+  const isTopRit = ride.in_ranking && ride.points === 5;
 
   async function toggleRegistration() {
     if (!currentUserId) {
@@ -63,11 +64,15 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
     <article
       id={`rit-${ride.id}`}
       className={cn(
-        'card transition',
+        'card transition relative overflow-hidden',
         ride.cancelled && 'opacity-50',
-        isRegistered && 'border-brand-700/40'
+        isTopRit ? 'border-amber-500/50 bg-gradient-to-r from-amber-950/20 to-transparent' : '',
+        !isTopRit && isRegistered && 'border-brand-700/40',
       )}
     >
+      {isTopRit && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/0 via-amber-400 to-amber-500/0" />
+      )}
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
@@ -76,10 +81,17 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
               </span>
               {ride.in_ranking && ride.points > 0 && (
-                <span className="badge bg-brand-700/20 text-brand-200 border border-brand-700/30">
-                  <Trophy className="h-3 w-3 mr-1" />
-                  {ride.points} punt{ride.points !== 1 && 'en'}
-                </span>
+                isTopRit ? (
+                  <span className="badge bg-amber-800/50 text-amber-300 border border-amber-600/50">
+                    <Star className="h-3 w-3 mr-1 fill-amber-400 text-amber-400" />
+                    5 punten
+                  </span>
+                ) : (
+                  <span className="badge bg-brand-700/20 text-brand-200 border border-brand-700/30">
+                    <Trophy className="h-3 w-3 mr-1" />
+                    {ride.points} punt{ride.points !== 1 && 'en'}
+                  </span>
+                )
               )}
               {ride.distance_km && (
                 <span className="badge bg-ink-800 text-ink-200 border border-ink-700">

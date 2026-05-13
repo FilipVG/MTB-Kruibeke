@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, MapPin, Trophy, Users, Check } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Users, Check, Star } from 'lucide-react';
 import { formatRideDate, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types/database';
@@ -48,9 +48,19 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
   }
 
   const canRegister = ride.registration_open && !ride.cancelled;
+  const isTopRit = ride.in_ranking && ride.points === 5;
 
   return (
-    <div className={cn('card p-5 flex flex-col gap-3', ride.is_registered && 'border-brand-700/40')}>
+    <div className={cn(
+      'card p-5 flex flex-col gap-3 relative overflow-hidden',
+      isTopRit ? 'border-amber-500/50 bg-gradient-to-b from-amber-950/30 to-transparent' : '',
+      !isTopRit && ride.is_registered && 'border-brand-700/40',
+    )}>
+      {/* Toprit accent */}
+      {isTopRit && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/0 via-amber-400 to-amber-500/0" />
+      )}
+
       {/* Badges + teller */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -58,10 +68,17 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
             {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
           </span>
           {ride.in_ranking && ride.points > 0 && (
-            <span className="badge bg-brand-700/20 text-brand-200 border border-brand-700/30">
-              <Trophy className="h-3 w-3 mr-1" />
-              {ride.points} pt
-            </span>
+            isTopRit ? (
+              <span className="badge bg-amber-800/50 text-amber-300 border border-amber-600/50">
+                <Star className="h-3 w-3 mr-1 fill-amber-400 text-amber-400" />
+                5 punten
+              </span>
+            ) : (
+              <span className="badge bg-brand-700/20 text-brand-200 border border-brand-700/30">
+                <Trophy className="h-3 w-3 mr-1" />
+                {ride.points} pt
+              </span>
+            )
           )}
         </div>
         <span className="flex items-center gap-1 text-xs text-ink-500">
@@ -71,7 +88,7 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       </div>
 
       {/* Titel */}
-      <h3 className="font-medium text-white leading-snug">{ride.title}</h3>
+      <h3 className={cn('font-medium leading-snug', isTopRit ? 'text-amber-50 text-base' : 'text-white')}>{ride.title}</h3>
 
       {/* Datum + locatie */}
       <div className="space-y-1 text-xs text-ink-400">
