@@ -167,16 +167,6 @@ function MainSponsorCard({ sponsor }: { sponsor: Sponsor }) {
   const content = (
     <>
       <span className="absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden />
-      {sponsor.logo_url ? (
-        <div className="flex items-center justify-center h-12 mb-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={sponsor.logo_url}
-            alt={sponsor.name}
-            className="max-h-12 max-w-[160px] object-contain"
-          />
-        </div>
-      ) : null}
       <p className="text-base font-medium text-white text-center">{sponsor.name}</p>
       {sponsor.website_url && (
         <p className="text-xs text-ink-500 text-center mt-1 flex items-center justify-center gap-1">
