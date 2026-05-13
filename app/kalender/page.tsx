@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Calendar, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideListItem } from '@/components/rides/RideListItem';
 import { ActivityListItem } from '@/components/activities/ActivityListItem';
+import { AbonneerKnop } from '@/components/kalender/AbonneerKnop';
 import type { Ride, Activity, Profile } from '@/lib/types/database';
 
 export const metadata = { title: 'Kalender — MTB Kruibeke' };
@@ -90,10 +91,7 @@ export default async function KalenderPage({ searchParams }: Props) {
             {!current && ' Log in om je in te schrijven.'}
           </p>
         </div>
-        <Link href="/api/calendar.ics" className="btn-secondary self-start" title="Voeg toe aan Google Calendar, Apple Agenda, Outlook…">
-          <Download className="h-4 w-4" />
-          Abonneer op kalender
-        </Link>
+        <AbonneerKnop url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtb-kruibeke.vercel.app'}/api/calendar.ics`} />
       </div>
 
       {/* Maandnavigatie */}
