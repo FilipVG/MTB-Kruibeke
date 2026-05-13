@@ -158,7 +158,7 @@ function MainSponsorCard({ sponsor }: { sponsor: Sponsor }) {
   );
 
   const className =
-    'relative block bg-ink-900/60 border border-brand-700/40 hover:border-brand-600 hover:bg-ink-900 rounded-lg p-5 transition group w-48 text-center';
+    'relative flex flex-col items-center justify-center bg-ink-900/60 border border-brand-700/40 hover:border-brand-600 hover:bg-ink-900 rounded-lg p-5 transition group w-48 h-24';
 
   if (sponsor.website_url) {
     return (
