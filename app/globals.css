@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ink-950 text-ink-50 antialiased;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(157, 35, 58, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(157, 35, 58, 0.04) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-brand-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-ink-950 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-ink-700 bg-ink-900/50 px-4 py-2 text-sm font-medium text-ink-100 transition hover:bg-ink-800 hover:border-ink-600 disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-ink-200 transition hover:bg-ink-900 hover:text-white;
+  }
+
+  .card {
+    @apply rounded-lg border border-ink-800 bg-ink-900/40 backdrop-blur;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-ink-700 bg-ink-900/50 px-3 py-2 text-sm text-ink-50 placeholder-ink-500 transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-mtb {
+    @apply badge bg-brand-700/20 text-brand-200 border border-brand-700/30;
+  }
+
+  .badge-gravel {
+    @apply badge bg-amber-700/20 text-amber-200 border border-amber-700/30;
+  }
+}

@@ -1,0 +1,136 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { getInitials } from '@/lib/utils';
+import type { Profile } from '@/lib/types/database';
+
+export function ProfileForm({ profile }: { profile: Profile }) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    first_name: profile.first_name ?? '',
+    last_name: profile.last_name ?? '',
+    nickname: profile.nickname ?? '',
+    bio: profile.bio ?? '',
+    phone: profile.phone ?? '',
+    birthdate: profile.birthdate ?? '',
+  });
+  const [avatarPreview, setAvatarPreview] = useState(profile.avatar_url);
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSaving(true);
+    setMessage(null);
+    const ext = file.name.split('.').pop();
+    const path = `${profile.id}/avatar.${ext}`;
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true });
+    if (error) {
+      setMessage(`Upload mislukt: ${error.message}`);
+      setSaving(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
+    const cacheBusted = `${publicUrl}?t=${Date.now()}`;
+    await supabase.from('profiles').update({ avatar_url: cacheBusted }).eq('id', profile.id);
+    setAvatarPreview(cacheBusted);
+    setSaving(false);
+    router.refresh();
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        ...form,
+        birthdate: form.birthdate || null,
+      })
+      .eq('id', profile.id);
+    if (error) {
+      setMessage(`Opslaan mislukt: ${error.message}`);
+    } else {
+      setMessage('Opgeslagen.');
+      router.refresh();
+    }
+    setSaving(false);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Avatar */}
+      <div className="card p-6">
+        <label className="block text-sm font-medium text-ink-200 mb-3">Profielfoto</label>
+        <div className="flex items-center gap-4">
+          {avatarPreview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarPreview} alt="" className="h-20 w-20 rounded-full object-cover" />
+          ) : (
+            <div className="h-20 w-20 rounded-full bg-brand-700 flex items-center justify-center text-xl font-medium text-white">
+              {getInitials(profile)}
+            </div>
+          )}
+          <label className="btn-secondary cursor-pointer">
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            Foto kiezen
+          </label>
+        </div>
+      </div>
+
+      {/* Personalia */}
+      <div className="card p-6 space-y-4">
+        <h2 className="font-medium text-white">Personalia</h2>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Voornaam</label>
+            <input className="input" value={form.first_name} onChange={e => setForm({ ...form, first_name: e.target.value })} />
+          </div>
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Achternaam</label>
+            <input className="input" value={form.last_name} onChange={e => setForm({ ...form, last_name: e.target.value })} />
+          </div>
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Roepnaam</label>
+            <input className="input" value={form.nickname} onChange={e => setForm({ ...form, nickname: e.target.value })} placeholder="Bijnaam onder de bikers" />
+          </div>
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Telefoon</label>
+            <input type="tel" className="input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+          </div>
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Geboortedatum</label>
+            <input type="date" className="input" value={form.birthdate} onChange={e => setForm({ ...form, birthdate: e.target.value })} />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm text-ink-200 mb-1.5">Over mezelf</label>
+          <textarea
+            className="input min-h-[100px]"
+            value={form.bio}
+            onChange={e => setForm({ ...form, bio: e.target.value })}
+            placeholder="Vertel iets over jezelf, je fiets, je favoriete parcours..."
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        {message && (
+          <p className={message.includes('mislukt') ? 'text-red-400 text-sm' : 'text-green-400 text-sm'}>
+            {message}
+          </p>
+        )}
+        <button type="submit" disabled={saving} className="btn-primary ml-auto">
+          {saving ? 'Opslaan…' : 'Wijzigingen opslaan'}
+        </button>
+      </div>
+    </form>
+  );
+}
