@@ -127,7 +127,7 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                     Ingeschreven
                   </>
                 ) : (
-                  'Schrijf in'
+                  'Ik kom af!'
                 )}
               </button>
             ) : (
