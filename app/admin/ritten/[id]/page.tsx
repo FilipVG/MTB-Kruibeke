@@ -4,13 +4,20 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { formatRideDate } from '@/lib/utils';
-import { Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
 
 interface Registration {
   id: string;
   attended: boolean | null;
   user_id: string;
   profile: { first_name: string | null; last_name: string | null; nickname: string | null };
+}
+
+interface Member {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  nickname: string | null;
 }
 
 interface Ride {
@@ -40,6 +47,8 @@ export default function RitBeheerPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [gpxFile, setGpxFile] = useState<File | null>(null);
+  const [allMembers, setAllMembers] = useState<Member[]>([]);
+  const [addMemberId, setAddMemberId] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -66,6 +75,13 @@ export default function RitBeheerPage() {
         .eq('ride_id', id)
         .order('created_at', { ascending: true });
       setRegistrations((regs as unknown as Registration[]) ?? []);
+
+      const { data: members } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, nickname')
+        .eq('is_active', true)
+        .order('first_name', { ascending: true });
+      setAllMembers((members as Member[]) ?? []);
     }
     load();
   }, [id]);
@@ -104,6 +120,31 @@ export default function RitBeheerPage() {
     const next = current === true ? false : current === false ? null : true;
     await supabase.from('ride_registrations').update({ attended: next }).eq('id', regId);
     setRegistrations(prev => prev.map(r => r.id === regId ? { ...r, attended: next } : r));
+  }
+
+  async function removeRegistration(regId: string) {
+    await supabase.from('ride_registrations').delete().eq('id', regId);
+    setRegistrations(prev => prev.filter(r => r.id !== regId));
+  }
+
+  async function addMember() {
+    if (!addMemberId) return;
+    const member = allMembers.find(m => m.id === addMemberId);
+    if (!member) return;
+    const { data, error } = await supabase
+      .from('ride_registrations')
+      .insert({ ride_id: id, user_id: addMemberId })
+      .select('id, attended, user_id')
+      .single();
+    if (!error && data) {
+      setRegistrations(prev => [...prev, {
+        id: data.id,
+        attended: data.attended,
+        user_id: data.user_id,
+        profile: { first_name: member.first_name, last_name: member.last_name, nickname: member.nickname },
+      }]);
+      setAddMemberId('');
+    }
   }
 
   async function handleDelete() {
@@ -218,31 +259,70 @@ export default function RitBeheerPage() {
         <h2 className="font-semibold text-white text-lg mb-4">
           Inschrijvingen ({registrations.length})
         </h2>
+
         {registrations.length === 0 ? (
-          <p className="text-ink-400 text-sm">Nog niemand ingeschreven.</p>
+          <p className="text-ink-400 text-sm mb-4">Nog niemand ingeschreven.</p>
         ) : (
-          <div className="divide-y divide-ink-800">
+          <div className="divide-y divide-ink-800 mb-4">
             {registrations.map(reg => (
-              <div key={reg.id} className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-200">{displayName(reg.profile)}</span>
-                <button
-                  onClick={() => toggleAttendance(reg.id, reg.attended)}
-                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition ${
-                    reg.attended === true
-                      ? 'bg-green-900/40 border-green-700 text-green-300'
-                      : reg.attended === false
-                      ? 'bg-red-900/40 border-red-800 text-red-300'
-                      : 'bg-ink-800 border-ink-700 text-ink-400'
-                  }`}
-                >
-                  {reg.attended === true ? <><Check className="h-3 w-3" /> Aanwezig</> :
-                   reg.attended === false ? <><X className="h-3 w-3" /> Afwezig</> :
-                   'Niet gemarkeerd'}
-                </button>
+              <div key={reg.id} className="flex items-center justify-between py-3 gap-3">
+                <span className="text-sm text-ink-200 min-w-0 truncate">{displayName(reg.profile)}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => toggleAttendance(reg.id, reg.attended)}
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition ${
+                      reg.attended === true
+                        ? 'bg-green-900/40 border-green-700 text-green-300'
+                        : reg.attended === false
+                        ? 'bg-red-900/40 border-red-800 text-red-300'
+                        : 'bg-ink-800 border-ink-700 text-ink-400'
+                    }`}
+                  >
+                    {reg.attended === true ? <><Check className="h-3 w-3" /> Aanwezig</> :
+                     reg.attended === false ? <><X className="h-3 w-3" /> Afwezig</> :
+                     'Niet gemarkeerd'}
+                  </button>
+                  <button
+                    onClick={() => removeRegistration(reg.id)}
+                    className="p-1.5 text-ink-600 hover:text-red-400 transition"
+                    title="Verwijderen"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
+
+        {/* Lid toevoegen */}
+        <div className="border-t border-ink-800 pt-4">
+          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-2">Lid toevoegen</p>
+          <div className="flex gap-2">
+            <select
+              className="input flex-1"
+              value={addMemberId}
+              onChange={e => setAddMemberId(e.target.value)}
+            >
+              <option value="">— Kies een lid —</option>
+              {allMembers
+                .filter(m => !registrations.some(r => r.user_id === m.id))
+                .map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.nickname || [m.first_name, m.last_name].filter(Boolean).join(' ')}
+                  </option>
+                ))}
+            </select>
+            <button
+              onClick={addMember}
+              disabled={!addMemberId}
+              className="btn-secondary disabled:opacity-40 shrink-0"
+            >
+              <UserPlus className="h-4 w-4" />
+              Toevoegen
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Verwijderen */}
