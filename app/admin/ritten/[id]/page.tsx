@@ -21,6 +21,7 @@ interface Ride {
   start_at: string;
   start_location: string;
   distance_km: number | null;
+  gpx_url: string | null;
   in_ranking: boolean;
   points: number;
   registration_open: boolean;
@@ -52,6 +53,7 @@ export default function RitBeheerPage() {
           start_at: r.start_at.slice(0, 16),
           start_location: r.start_location,
           distance_km: r.distance_km,
+          gpx_url: r.gpx_url,
           in_ranking: r.in_ranking,
           points: r.points,
           registration_open: r.registration_open,
