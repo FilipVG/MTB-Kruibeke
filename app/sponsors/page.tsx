@@ -29,7 +29,7 @@ export default async function SponsorsPage() {
           <h2 className="text-xs uppercase tracking-[0.2em] text-brand-400 font-medium mb-4">
             Hoofdsponsors
           </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             {mainSponsors.map(sponsor => (
               <SponsorTile key={sponsor.id} sponsor={sponsor} variant="main" />
             ))}
@@ -43,7 +43,7 @@ export default async function SponsorsPage() {
           <h2 className="text-xs uppercase tracking-[0.2em] text-ink-500 font-medium mb-4">
             Sponsors
           </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {regularSponsors.map(sponsor => (
               <SponsorTile key={sponsor.id} sponsor={sponsor} variant="regular" />
             ))}
@@ -62,22 +62,22 @@ function SponsorTile({ sponsor, variant }: { sponsor: Sponsor; variant: 'main' |
   const isMain = variant === 'main';
 
   const wrapperClass = isMain
-    ? 'relative card p-6 hover:border-brand-600 transition flex items-center gap-5 border-brand-700/40'
-    : 'card p-4 hover:border-brand-700/40 transition flex items-center gap-3';
+    ? 'relative card p-8 hover:border-brand-600 transition flex items-center gap-6 border-brand-700/40'
+    : 'card p-6 hover:border-brand-700/40 transition flex items-center gap-4';
 
   const logoBox = sponsor.logo_url ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={sponsor.logo_url}
       alt={sponsor.name}
-      className={isMain ? 'h-16 w-16 object-contain shrink-0 bg-white rounded-md p-2' : 'h-12 w-12 object-contain shrink-0 bg-white/95 rounded-md p-1.5'}
+      className={isMain ? 'h-28 w-28 object-contain shrink-0 bg-white rounded-md p-3' : 'h-20 w-20 object-contain shrink-0 bg-white/95 rounded-md p-2'}
     />
   ) : (
     <div
       className={
         isMain
-          ? 'h-16 w-16 bg-brand-900/40 rounded-md flex items-center justify-center text-brand-300 font-semibold shrink-0'
-          : 'h-12 w-12 bg-ink-800 rounded-md flex items-center justify-center text-ink-300 font-medium shrink-0'
+          ? 'h-28 w-28 bg-brand-900/40 rounded-md flex items-center justify-center text-brand-300 text-3xl font-semibold shrink-0'
+          : 'h-20 w-20 bg-ink-800 rounded-md flex items-center justify-center text-ink-300 text-2xl font-medium shrink-0'
       }
     >
       {sponsor.name.charAt(0)}
@@ -91,12 +91,12 @@ function SponsorTile({ sponsor, variant }: { sponsor: Sponsor; variant: 'main' |
       )}
       {logoBox}
       <div className="flex-1 min-w-0">
-        <h3 className={isMain ? 'text-base font-medium text-white flex items-center gap-1.5' : 'text-sm font-medium text-white flex items-center gap-1.5'}>
+        <h3 className={isMain ? 'text-xl font-medium text-white flex items-center gap-1.5' : 'text-base font-medium text-white flex items-center gap-1.5'}>
           {sponsor.name}
           {sponsor.website_url && <ExternalLink className="h-3 w-3 text-ink-500" />}
         </h3>
         {sponsor.description && (
-          <p className={isMain ? 'text-sm text-ink-400 mt-1 line-clamp-2' : 'text-xs text-ink-500 mt-0.5 line-clamp-1'}>
+          <p className={isMain ? 'text-base text-ink-400 mt-1 line-clamp-2' : 'text-sm text-ink-500 mt-0.5 line-clamp-1'}>
             {sponsor.description}
           </p>
         )}

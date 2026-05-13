@@ -36,9 +36,9 @@ export function Header({ profile }: { profile: Profile | null }) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           <Link href="/">
             <Logo />
           </Link>
@@ -84,14 +84,9 @@ export function Header({ profile }: { profile: Profile | null }) {
                 </button>
               </div>
             ) : (
-              <>
-                <Link href="/auth/login" className="btn-ghost">
-                  Inloggen
-                </Link>
-                <Link href="/lid-worden" className="btn-primary">
-                  Lid worden
-                </Link>
-              </>
+              <Link href="/auth/login" className="btn-primary">
+                Inloggen
+              </Link>
             )}
           </div>
 

@@ -192,7 +192,7 @@ function MainSponsorCard({ sponsor }: { sponsor: Sponsor }) {
 
 function RegularSponsorPill({ sponsor }: { sponsor: Sponsor }) {
   const className =
-    'text-xs sm:text-sm text-ink-300 hover:text-white px-3 py-1.5 border border-ink-800 hover:border-ink-600 rounded-full transition';
+    'text-sm sm:text-base text-ink-300 hover:text-white px-5 py-2 border border-ink-800 hover:border-ink-600 rounded-full transition';
 
   if (sponsor.website_url) {
     return (
