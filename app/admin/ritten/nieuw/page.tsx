@@ -16,8 +16,8 @@ export default function NieuweRitPage() {
     start_at: '',
     start_location: '',
     distance_km: '',
-    in_ranking: false,
-    points: 0,
+    in_ranking: true,
+    points: 2,
   });
   const [gpxFile, setGpxFile] = useState<File | null>(null);
 
@@ -145,7 +145,7 @@ export default function NieuweRitPage() {
             <input
               type="checkbox"
               checked={form.in_ranking}
-              onChange={e => setForm({ ...form, in_ranking: e.target.checked })}
+              onChange={e => setForm({ ...form, in_ranking: e.target.checked, points: e.target.checked ? 2 : 0 })}
               className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500"
             />
             <span className="text-sm text-ink-200">Telt mee voor puntenklassement</span>
