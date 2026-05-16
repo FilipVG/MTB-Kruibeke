@@ -13,7 +13,7 @@ interface Props {
     id: string;
     title: string;
     description: string | null;
-    ride_type: 'mtb' | 'gravel';
+    ride_type: 'mtb' | 'gravel' | 'baanrit';
     start_at: string;
     start_location: string;
     distance_km: number | null;

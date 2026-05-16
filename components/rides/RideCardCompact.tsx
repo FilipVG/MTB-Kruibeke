@@ -12,7 +12,7 @@ interface Props {
   ride: {
     id: string;
     title: string;
-    ride_type: 'mtb' | 'gravel';
+    ride_type: 'mtb' | 'gravel' | 'baanrit';
     start_at: string;
     start_location: string;
     in_ranking: boolean;
