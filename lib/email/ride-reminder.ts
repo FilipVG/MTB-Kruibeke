@@ -138,7 +138,7 @@ export function buildRideReminderEmail(
               ✓ Al ingeschreven
             </a>`
               : `<a href="${registerUrl}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
-              Inschrijven voor deze rit →
+              Ik kom af!
             </a>`}
           </td>
         </tr>
