@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { fromDatetimeLocal, toDatetimeLocal } from '@/lib/utils';
+import { fromDatetimeLocal } from '@/lib/utils';
 
-function defaultReminderAt(startAt: string): string {
-  if (!startAt) return '';
-  const d = new Date(fromDatetimeLocal(startAt));
-  d.setHours(d.getHours() - 24);
-  return toDatetimeLocal(d.toISOString());
+function computeReminderAt(startAtUtc: string, daysBefore: number): string {
+  const d = new Date(startAtUtc);
+  d.setUTCDate(d.getUTCDate() - daysBefore);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
 }
 
 export default function NieuweRitPage() {
@@ -22,12 +22,13 @@ export default function NieuweRitPage() {
     description: '',
     ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit',
     start_at: '',
-    reminder_at: '',
     start_location: '',
     distance_km: '',
     in_ranking: true,
     points: 2,
   });
+  const [sendReminder, setSendReminder] = useState(true);
+  const [daysBefore, setDaysBefore] = useState(2);
   const [gpxFile, setGpxFile] = useState<File | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -54,7 +55,7 @@ export default function NieuweRitPage() {
         ...form,
         distance_km: form.distance_km ? Number(form.distance_km) : null,
         start_at: fromDatetimeLocal(form.start_at),
-        reminder_at: form.reminder_at ? fromDatetimeLocal(form.reminder_at) : null,
+        reminder_at: sendReminder && form.start_at ? computeReminderAt(fromDatetimeLocal(form.start_at), daysBefore) : null,
         gpx_url,
       })
       .select('id')
@@ -108,20 +109,34 @@ export default function NieuweRitPage() {
               type="datetime-local"
               className="input"
               value={form.start_at}
-              onChange={e => setForm({ ...form, start_at: e.target.value, reminder_at: defaultReminderAt(e.target.value) })}
+              onChange={e => setForm({ ...form, start_at: e.target.value })}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm text-ink-200 mb-1.5">Email versturen</label>
-          <input
-            type="datetime-local"
-            className="input"
-            value={form.reminder_at}
-            onChange={e => setForm({ ...form, reminder_at: e.target.value })}
-          />
-          <p className="text-xs text-ink-600 mt-1">Standaard 24u voor de start. Laat leeg om geen herinnering te sturen.</p>
+        <div className="pt-1">
+          <label className="flex items-center gap-2 mb-3">
+            <input
+              type="checkbox"
+              checked={sendReminder}
+              onChange={e => setSendReminder(e.target.checked)}
+              className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500"
+            />
+            <span className="text-sm text-ink-200">Inschrijving mail versturen</span>
+          </label>
+          {sendReminder && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-ink-400">Hoeveel dagen op voorhand:</label>
+              <input
+                type="number"
+                min="1"
+                max="30"
+                className="input w-20"
+                value={daysBefore}
+                onChange={e => setDaysBefore(Number(e.target.value))}
+              />
+            </div>
+          )}
         </div>
 
         <div>

@@ -7,6 +7,13 @@ import { formatRideDate, toDatetimeLocal, fromDatetimeLocal } from '@/lib/utils'
 
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
 
+function computeReminderAt(startAtUtc: string, daysBefore: number): string {
+  const d = new Date(startAtUtc);
+  d.setUTCDate(d.getUTCDate() - daysBefore);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
 interface Registration {
   id: string;
   attended: boolean | null;
@@ -51,6 +58,8 @@ export default function RitBeheerPage() {
   const [gpxFile, setGpxFile] = useState<File | null>(null);
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [addMemberId, setAddMemberId] = useState('');
+  const [sendReminder, setSendReminder] = useState(true);
+  const [daysBefore, setDaysBefore] = useState(2);
 
   useEffect(() => {
     async function load() {
@@ -69,8 +78,13 @@ export default function RitBeheerPage() {
           points: r.points,
           registration_open: r.registration_open,
           cancelled: r.cancelled,
-          reminder_at: r.reminder_at ? toDatetimeLocal(r.reminder_at) : '',
+          reminder_at: r.reminder_at,
         });
+        setSendReminder(!!r.reminder_at);
+        if (r.reminder_at) {
+          const diff = Math.round((new Date(r.start_at).getTime() - new Date(r.reminder_at).getTime()) / 86400000);
+          setDaysBefore(diff > 0 ? diff : 2);
+        }
       }
       const { data: regs } = await supabase
         .from('ride_registrations')
@@ -113,7 +127,7 @@ export default function RitBeheerPage() {
       description: form.description || null,
       distance_km: form.distance_km || null,
       start_at: fromDatetimeLocal(form.start_at),
-        reminder_at: form.reminder_at ? fromDatetimeLocal(form.reminder_at) : null,
+      reminder_at: sendReminder ? computeReminderAt(fromDatetimeLocal(form.start_at), daysBefore) : null,
       gpx_url,
     }).eq('id', id);
     setSaving(false);
@@ -198,10 +212,29 @@ export default function RitBeheerPage() {
               <input required type="datetime-local" className="input" value={form.start_at} onChange={e => setForm({ ...form, start_at: e.target.value })} />
             </div>
           </div>
-          <div>
-            <label className="block text-sm text-ink-200 mb-1.5">Email versturen</label>
-            <input type="datetime-local" className="input" value={form.reminder_at ?? ''} onChange={e => setForm({ ...form, reminder_at: e.target.value })} />
-            <p className="text-xs text-ink-600 mt-1">Standaard 24u voor de start. Laat leeg om geen herinnering te sturen.</p>
+          <div className="pt-1">
+            <label className="flex items-center gap-2 mb-3">
+              <input
+                type="checkbox"
+                checked={sendReminder}
+                onChange={e => setSendReminder(e.target.checked)}
+                className="rounded border-ink-700 bg-ink-900 text-brand-700"
+              />
+              <span className="text-sm text-ink-200">Inschrijving mail versturen</span>
+            </label>
+            {sendReminder && (
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-ink-400">Hoeveel dagen op voorhand:</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  className="input w-20"
+                  value={daysBefore}
+                  onChange={e => setDaysBefore(Number(e.target.value))}
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm text-ink-200 mb-1.5">Startlocatie</label>
