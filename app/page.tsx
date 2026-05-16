@@ -68,7 +68,7 @@ export default async function HomePage() {
               {current ? 'Schrijf je in voor de volgende rit.' : 'Log in om je in te schrijven.'}
             </p>
           </div>
-          <Link href="/kalender" className="text-sm text-brand-400 hover:text-brand-300 hidden sm:flex items-center gap-1">
+          <Link href="/kalender" className="text-sm text-brand-400 hover:text-brand-300 flex items-center gap-1">
             Alles bekijken <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
