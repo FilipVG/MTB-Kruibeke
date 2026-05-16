@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { AlertTriangle, KeyRound, Copy, Check, Camera } from 'lucide-react';
+import { validateImageFile } from '@/lib/utils';
 
 interface Profile {
   id: string;
@@ -177,6 +178,10 @@ export default function LidBeheerPage() {
               className="hidden"
               onChange={e => {
                 const file = e.target.files?.[0] ?? null;
+                if (file) {
+                  const err = validateImageFile(file);
+                  if (err) { setMessage(err); e.target.value = ''; return; }
+                }
                 setAvatarFile(file);
                 setAvatarPreview(file ? URL.createObjectURL(file) : null);
               }}

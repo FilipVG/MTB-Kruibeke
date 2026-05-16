@@ -3,14 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { fromDatetimeLocal } from '@/lib/utils';
-
-function computeReminderAt(startAtUtc: string, daysBefore: number): string {
-  const d = new Date(startAtUtc);
-  d.setUTCDate(d.getUTCDate() - daysBefore);
-  d.setUTCHours(0, 0, 0, 0);
-  return d.toISOString();
-}
+import { fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
 
 export default function NieuweRitPage() {
   const router = useRouter();
@@ -176,7 +169,14 @@ export default function NieuweRitPage() {
           <input
             type="file"
             accept=".gpx,application/gpx+xml"
-            onChange={e => setGpxFile(e.target.files?.[0] ?? null)}
+            onChange={e => {
+              const file = e.target.files?.[0] ?? null;
+              if (file) {
+                const err = validateGpxFile(file);
+                if (err) { setError(err); e.target.value = ''; return; }
+              }
+              setGpxFile(file);
+            }}
             className="text-sm text-ink-300"
           />
         </div>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { getInitials } from '@/lib/utils';
+import { getInitials, validateImageFile } from '@/lib/utils';
 import { AvatarCropper } from './AvatarCropper';
 import type { Profile } from '@/lib/types/database';
 
@@ -27,6 +27,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const err = validateImageFile(file);
+    if (err) { setMessage(err); e.target.value = ''; return; }
     const reader = new FileReader();
     reader.onload = () => setCropSrc(reader.result as string);
     reader.readAsDataURL(file);
@@ -97,7 +99,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             </div>
           )}
           <label className="btn-secondary cursor-pointer">
-            <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
             Foto kiezen
           </label>
         </div>

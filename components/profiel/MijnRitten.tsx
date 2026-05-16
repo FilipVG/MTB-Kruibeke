@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -28,6 +28,7 @@ interface Props {
 
 function UitschrijfKnop({ registrationId, rideId }: { registrationId: string; rideId: string }) {
   const [pending, startTransition] = useTransition();
+  const [confirm, setConfirm] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -38,15 +39,35 @@ function UitschrijfKnop({ registrationId, rideId }: { registrationId: string; ri
     });
   }
 
+  if (confirm) {
+    return (
+      <div className="inline-flex items-center gap-1.5">
+        <span className="text-xs text-ink-400">Zeker?</span>
+        <button
+          onClick={uitschrijven}
+          disabled={pending}
+          className="text-xs text-red-400 hover:text-red-300 border border-red-900/60 rounded-md px-2 py-1 transition disabled:opacity-50"
+        >
+          {pending ? 'Bezig…' : 'Ja'}
+        </button>
+        <button
+          onClick={() => setConfirm(false)}
+          className="text-xs text-ink-400 hover:text-ink-200 border border-ink-700 rounded-md px-2 py-1 transition"
+        >
+          Nee
+        </button>
+      </div>
+    );
+  }
+
   return (
     <button
-      onClick={uitschrijven}
-      disabled={pending}
+      onClick={() => setConfirm(true)}
       title="Uitschrijven"
-      className="inline-flex items-center gap-1.5 text-xs text-ink-400 hover:text-red-400 border border-ink-700 hover:border-red-900/60 rounded-md px-2.5 py-1.5 transition disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 text-xs text-ink-400 hover:text-red-400 border border-ink-700 hover:border-red-900/60 rounded-md px-2.5 py-1.5 transition"
     >
       <LogOut className="h-3.5 w-3.5" />
-      {pending ? 'Bezig…' : 'Uitschrijven'}
+      Uitschrijven
     </button>
   );
 }

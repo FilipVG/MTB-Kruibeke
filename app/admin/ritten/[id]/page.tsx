@@ -3,16 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { formatRideDate, toDatetimeLocal, fromDatetimeLocal } from '@/lib/utils';
+import { formatRideDate, toDatetimeLocal, fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
 
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
-
-function computeReminderAt(startAtUtc: string, daysBefore: number): string {
-  const d = new Date(startAtUtc);
-  d.setUTCDate(d.getUTCDate() - daysBefore);
-  d.setUTCHours(0, 0, 0, 0);
-  return d.toISOString();
-}
 
 interface Registration {
   id: string;
@@ -254,7 +247,14 @@ export default function RitBeheerPage() {
               <input
                 type="file"
                 accept=".gpx,application/gpx+xml"
-                onChange={e => setGpxFile(e.target.files?.[0] ?? null)}
+                onChange={e => {
+                const file = e.target.files?.[0] ?? null;
+                if (file) {
+                  const err = validateGpxFile(file);
+                  if (err) { setMessage(err); e.target.value = ''; return; }
+                }
+                setGpxFile(file);
+              }}
                 className="text-sm text-ink-300"
               />
               {ride?.gpx_url && !gpxFile && (

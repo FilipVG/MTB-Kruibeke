@@ -43,6 +43,29 @@ export function isRegistrationOpen(ride: { start_at: string; registration_open: 
   return ride.registration_open && !ride.cancelled && !isPast(new Date(ride.start_at));
 }
 
+export function computeReminderAt(startAtUtc: string, daysBefore: number): string {
+  const d = new Date(startAtUtc);
+  d.setUTCDate(d.getUTCDate() - daysBefore);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const MAX_GPX_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+export function validateImageFile(file: File): string | null {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return 'Enkel JPG, PNG of WebP toegestaan.';
+  if (file.size > MAX_AVATAR_BYTES) return 'Bestand mag maximaal 2 MB zijn.';
+  return null;
+}
+
+export function validateGpxFile(file: File): string | null {
+  if (file.name.split('.').pop()?.toLowerCase() !== 'gpx') return 'Enkel GPX-bestanden zijn toegestaan.';
+  if (file.size > MAX_GPX_BYTES) return 'Bestand mag maximaal 5 MB zijn.';
+  return null;
+}
+
 // Converteert UTC ISO-string naar "YYYY-MM-DDTHH:mm" in Brussels-tijd (voor datetime-local input)
 export function toDatetimeLocal(utcStr: string): string {
   return new Intl.DateTimeFormat('sv', {
