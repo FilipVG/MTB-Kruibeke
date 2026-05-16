@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // CDN cachet 1 uur
 
 function formatICalDate(date: Date): string {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
@@ -17,7 +17,7 @@ function escapeText(text: string): string {
  * Te abonneren in Google Calendar, Apple Agenda, Outlook…
  */
 export async function GET() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Komende + recente ritten (laatste maand + komende 6 maanden)
   const lowerBound = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();

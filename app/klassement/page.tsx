@@ -4,7 +4,6 @@ import { getInitials, getDisplayName, cn } from '@/lib/utils';
 import type { RankingEntry } from '@/lib/types/database';
 
 export const metadata = { title: 'Klassement — MTB Kruibeke' };
-export const dynamic = 'force-dynamic';
 
 interface Props {
   searchParams: Promise<{ jaar?: string }>;
