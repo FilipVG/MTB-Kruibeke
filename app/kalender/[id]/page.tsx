@@ -47,8 +47,8 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
 
         {/* Badges */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : 'badge-gravel'}>
-            {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
+          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : ride.ride_type === 'gravel' ? 'badge-gravel' : 'badge-baanrit'}>
+            {ride.ride_type === 'mtb' ? 'MTB' : ride.ride_type === 'gravel' ? 'Gravel' : 'Training'}
           </span>
           {ride.in_ranking && ride.points > 0 && (
             isTopRit ? (

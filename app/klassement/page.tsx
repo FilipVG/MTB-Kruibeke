@@ -1,4 +1,4 @@
-import { Trophy, Medal } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getInitials, getDisplayName, cn } from '@/lib/utils';
 import type { RankingEntry } from '@/lib/types/database';
@@ -6,12 +6,25 @@ import type { RankingEntry } from '@/lib/types/database';
 export const metadata = { title: 'Klassement — MTB Kruibeke' };
 export const dynamic = 'force-dynamic';
 
-export default async function KlassementPage() {
+interface Props {
+  searchParams: Promise<{ jaar?: string }>;
+}
+
+export default async function KlassementPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const huidigJaar = new Date().getFullYear();
+
   const supabase = await createClient();
-  const { data: ranking } = await supabase
-    .from('ranking')
-    .select('*')
-    .order('total_points', { ascending: false });
+
+  const { data: jarenData } = await supabase.rpc('get_ranking_years');
+  const jaren: number[] = (jarenData ?? []).map((r: { jaar: number }) => r.jaar);
+
+  const defaultJaar = jaren[0] ?? huidigJaar;
+  const jaar = jaren.includes(parseInt(params.jaar ?? ''))
+    ? parseInt(params.jaar!)
+    : defaultJaar;
+
+  const { data: ranking } = await supabase.rpc('get_ranking', { p_year: jaar });
 
   const entries = (ranking ?? []) as RankingEntry[];
   const podium = entries.slice(0, 3);
@@ -19,19 +32,39 @@ export default async function KlassementPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
-      <div className="mb-10">
-        <h1 className="text-3xl sm:text-4xl font-semibold text-white flex items-center gap-3">
-          <Trophy className="h-7 w-7 text-brand-500" />
-          Puntenklassement
-        </h1>
-        <p className="text-sm text-ink-400 mt-2">
-          Punten worden toegekend voor deelname aan ritten die in het klassement opgenomen zijn.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-white flex items-center gap-3">
+            <Trophy className="h-7 w-7 text-brand-500" />
+            Puntenklassement
+          </h1>
+          <p className="text-sm text-ink-400 mt-2">
+            Punten worden toegekend voor deelname aan ritten die in het klassement opgenomen zijn.
+          </p>
+        </div>
+
+        {/* Jaarselector */}
+        <div className="flex items-center gap-2 shrink-0">
+          {jaren.map(j => (
+            <a
+              key={j}
+              href={`?jaar=${j}`}
+              className={cn(
+                'px-3 py-1.5 rounded-md text-sm font-medium transition',
+                j === jaar
+                  ? 'bg-brand-700 text-white'
+                  : 'text-ink-400 hover:text-white hover:bg-ink-800'
+              )}
+            >
+              {j}
+            </a>
+          ))}
+        </div>
       </div>
 
       {entries.length === 0 ? (
         <div className="card p-12 text-center text-ink-400">
-          Nog geen klassement beschikbaar.
+          Geen klassement beschikbaar voor {jaar}.
         </div>
       ) : (
         <>
@@ -52,6 +85,9 @@ export default async function KlassementPage() {
                     <p className="mt-2 text-sm font-medium text-white truncate">{getDisplayName(entry)}</p>
                     <p className={cn('text-xs font-medium', place === 1 ? 'text-yellow-400' : place === 2 ? 'text-slate-300' : 'text-orange-500')}>
                       {entry.total_points} pt
+                    </p>
+                    <p className="text-xs text-ink-500">
+                      {entry.rides_attended} rit{entry.rides_attended !== 1 && 'ten'}
                     </p>
                     <div className={cn(
                       'mt-2 rounded-t-md border-t-2 flex items-center justify-center text-3xl font-semibold',

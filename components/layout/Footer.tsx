@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Logo } from './Logo';
+import { AbonneerKnop } from '@/components/kalender/AbonneerKnop';
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
           <div>
             <Logo />
             <p className="mt-4 text-sm text-ink-400 max-w-xs">
-              Mountainbike club met passie voor de sport. Toertochten in het Waasland sinds 2003.
+              Mountainbike club sinds 2012.
             </p>
           </div>
           <div>
@@ -22,15 +23,10 @@ export function Footer() {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-white mb-3">Kalender importeren</h4>
-            <p className="text-sm text-ink-400 mb-2">
+            <p className="text-sm text-ink-400 mb-4">
               Abonneer op de kalender in Google Calendar, Apple Agenda of Outlook.
             </p>
-            <Link
-              href="/api/calendar.ics"
-              className="text-sm text-brand-400 hover:text-brand-300 inline-flex items-center gap-1"
-            >
-              iCal feed →
-            </Link>
+            <AbonneerKnop url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtb-kruibeke.vercel.app'}/api/calendar.ics`} />
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-ink-800 text-xs text-ink-500 flex justify-between">

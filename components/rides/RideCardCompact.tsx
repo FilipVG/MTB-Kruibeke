@@ -51,6 +51,11 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
   const canRegister = ride.registration_open && !ride.cancelled;
   const isTopRit = ride.in_ranking && ride.points === 5;
 
+  const diffDagen = Math.ceil(
+    (new Date(ride.start_at).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000
+  );
+  const countdownLabel = diffDagen === 0 ? 'Vandaag' : diffDagen === 1 ? 'Morgen' : `Nog ${diffDagen} dagen`;
+
   return (
     <div className={cn(
       'card p-5 flex flex-col gap-3 relative overflow-hidden',
@@ -65,8 +70,8 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       {/* Badges + teller */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : 'badge-gravel'}>
-            {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
+          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : ride.ride_type === 'gravel' ? 'badge-gravel' : 'badge-baanrit'}>
+            {ride.ride_type === 'mtb' ? 'MTB' : ride.ride_type === 'gravel' ? 'Gravel' : 'Training'}
           </span>
           {ride.in_ranking && ride.points > 0 && (
             isTopRit ? (
@@ -97,9 +102,19 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
 
       {/* Datum + locatie */}
       <div className="space-y-1 text-xs text-ink-400">
-        <div className="flex items-center gap-1.5">
-          <Calendar className="h-3.5 w-3.5 shrink-0" />
-          <span>{formatRideDate(ride.start_at)}</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5 shrink-0" />
+            <span>{formatRideDate(ride.start_at)}</span>
+          </div>
+          <span className={cn(
+            'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
+            diffDagen === 0 ? 'bg-green-900/50 text-green-300' :
+            diffDagen <= 7 ? 'bg-brand-900/50 text-brand-300' :
+            'bg-ink-800 text-ink-400'
+          )}>
+            {countdownLabel}
+          </span>
         </div>
         <a
           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ride.start_location)}`}

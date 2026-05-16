@@ -42,3 +42,26 @@ export function getDisplayName(profile: {
 export function isRegistrationOpen(ride: { start_at: string; registration_open: boolean; cancelled: boolean }): boolean {
   return ride.registration_open && !ride.cancelled && !isPast(new Date(ride.start_at));
 }
+
+// Converteert UTC ISO-string naar "YYYY-MM-DDTHH:mm" in Brussels-tijd (voor datetime-local input)
+export function toDatetimeLocal(utcStr: string): string {
+  return new Intl.DateTimeFormat('sv', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit',
+  }).format(new Date(utcStr)).replace(' ', 'T');
+}
+
+// Converteert "YYYY-MM-DDTHH:mm" (Brussels-tijd) terug naar UTC ISO-string
+export function fromDatetimeLocal(localStr: string): string {
+  const approx = new Date(localStr + 'Z');
+  const offsetStr = new Intl.DateTimeFormat('en', {
+    timeZone: 'Europe/Brussels',
+    timeZoneName: 'shortOffset',
+  }).formatToParts(approx).find(p => p.type === 'timeZoneName')?.value ?? 'GMT+2';
+  const match = offsetStr.match(/GMT([+-]\d+)/);
+  const offsetHours = match ? parseInt(match[1]) : 2;
+  const sign = offsetHours >= 0 ? '+' : '-';
+  const pad = String(Math.abs(offsetHours)).padStart(2, '0');
+  return new Date(`${localStr}:00${sign}${pad}:00`).toISOString();
+}

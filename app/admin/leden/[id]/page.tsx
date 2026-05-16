@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, KeyRound, Copy, Check, Camera } from 'lucide-react';
 
 interface Profile {
   id: string;
@@ -16,6 +16,7 @@ interface Profile {
   bio: string | null;
   role: string;
   is_active: boolean;
+  avatar_url: string | null;
 }
 
 export default function LidBeheerPage() {
@@ -28,6 +29,13 @@ export default function LidBeheerPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [resetLink, setResetLink] = useState<string | null>(null);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     supabase.from('profiles').select('*').eq('id', id).single().then(({ data }) => {
@@ -43,6 +51,7 @@ export default function LidBeheerPage() {
           bio: data.bio ?? '',
           role: data.role ?? 'member',
           is_active: data.is_active,
+          avatar_url: data.avatar_url ?? null,
         });
       }
     });
@@ -54,6 +63,19 @@ export default function LidBeheerPage() {
     setSaving(true);
     setMessage(null);
 
+    let avatar_url = form.avatar_url;
+    if (avatarFile) {
+      const ext = avatarFile.name.split('.').pop();
+      const path = `${id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('avatars').upload(path, avatarFile, { upsert: true });
+      if (upErr) {
+        setMessage(`Foto upload mislukt: ${upErr.message}`);
+        setSaving(false);
+        return;
+      }
+      avatar_url = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+    }
+
     const { error } = await supabase.from('profiles').update({
       first_name: form.first_name || null,
       last_name: form.last_name || null,
@@ -62,6 +84,7 @@ export default function LidBeheerPage() {
       birthdate: form.birthdate || null,
       bio: form.bio || null,
       role: form.role,
+      avatar_url,
     }).eq('id', id);
 
     setSaving(false);
@@ -71,6 +94,24 @@ export default function LidBeheerPage() {
   async function handleDeactivate() {
     await supabase.from('profiles').update({ is_active: false }).eq('id', id);
     router.push('/admin/leden');
+  }
+
+  async function handleGenerateResetLink() {
+    setResetLoading(true);
+    setResetError(null);
+    setResetLink(null);
+    const res = await fetch(`/api/admin/leden/${id}/reset-password`, { method: 'POST' });
+    const json = await res.json();
+    setResetLoading(false);
+    if (!res.ok) { setResetError(json.error ?? 'Onbekende fout'); return; }
+    setResetLink(json.link);
+  }
+
+  async function handleCopyLink() {
+    if (!resetLink) return;
+    await navigator.clipboard.writeText(resetLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleReactivate() {
@@ -100,6 +141,48 @@ export default function LidBeheerPage() {
       <section className="card p-6">
         <h2 className="font-semibold text-white text-lg mb-4">Gegevens bewerken</h2>
         <form onSubmit={handleSave} className="space-y-4">
+          {/* Avatar */}
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              {avatarPreview || form.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarPreview ?? form.avatar_url!}
+                  alt=""
+                  className="h-20 w-20 rounded-full object-cover"
+                />
+              ) : (
+                <div className="h-20 w-20 rounded-full bg-brand-700 flex items-center justify-center text-2xl font-medium text-white">
+                  {(form.first_name?.[0] ?? form.email?.[0] ?? '?').toUpperCase()}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute bottom-0 right-0 h-7 w-7 rounded-full bg-ink-800 border border-ink-600 flex items-center justify-center hover:bg-ink-700 transition"
+                title="Foto wijzigen"
+              >
+                <Camera className="h-3.5 w-3.5 text-ink-200" />
+              </button>
+            </div>
+            <div>
+              <p className="text-sm text-ink-200 font-medium">Profielfoto</p>
+              <p className="text-xs text-ink-500 mt-0.5">JPG of PNG, max. 2 MB</p>
+              {avatarFile && <p className="text-xs text-brand-400 mt-1">{avatarFile.name}</p>}
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={e => {
+                const file = e.target.files?.[0] ?? null;
+                setAvatarFile(file);
+                setAvatarPreview(file ? URL.createObjectURL(file) : null);
+              }}
+            />
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-ink-200 mb-1.5">Voornaam</label>
@@ -164,6 +247,46 @@ export default function LidBeheerPage() {
             </button>
           </div>
         </form>
+      </section>
+
+      {/* Wachtwoord reset */}
+      <section className="card p-6">
+        <h2 className="font-semibold text-white text-lg mb-3 flex items-center gap-2">
+          <KeyRound className="h-5 w-5 text-brand-400" />
+          Wachtwoord resetten
+        </h2>
+        <p className="text-sm text-ink-400 mb-4">
+          Genereer een eenmalige resetlink en stuur die door aan het lid. De link is 24 uur geldig.
+        </p>
+
+        {!resetLink ? (
+          <>
+            {resetError && (
+              <p className="text-sm text-red-400 mb-3">{resetError}</p>
+            )}
+            <button onClick={handleGenerateResetLink} disabled={resetLoading} className="btn-secondary">
+              {resetLoading ? 'Bezig…' : 'Genereer resetlink'}
+            </button>
+          </>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                readOnly
+                value={resetLink}
+                className="input text-xs flex-1 truncate"
+                onFocus={e => e.target.select()}
+              />
+              <button onClick={handleCopyLink} className="btn-secondary shrink-0 px-3" title="Kopieer link">
+                {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+              </button>
+            </div>
+            {copied && <p className="text-xs text-green-400">Gekopieerd!</p>}
+            <button onClick={() => setResetLink(null)} className="text-xs text-ink-500 hover:text-ink-300">
+              Nieuwe link genereren
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Activiteit */}

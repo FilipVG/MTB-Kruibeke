@@ -52,4 +52,8 @@
   .badge-gravel {
     @apply badge bg-amber-700/20 text-amber-200 border border-amber-700/30;
   }
+
+  .badge-baanrit {
+    @apply badge bg-slate-700/20 text-slate-300 border border-slate-600/30;
+  }
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { fromDatetimeLocal } from '@/lib/utils';
 
 export default function NieuweRitPage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function NieuweRitPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    ride_type: 'mtb' as 'mtb' | 'gravel',
+    ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit',
     start_at: '',
     start_location: '',
     distance_km: '',
@@ -44,7 +45,7 @@ export default function NieuweRitPage() {
       .insert({
         ...form,
         distance_km: form.distance_km ? Number(form.distance_km) : null,
-        start_at: new Date(form.start_at).toISOString(),
+        start_at: fromDatetimeLocal(form.start_at),
         gpx_url,
       })
       .select('id')
@@ -80,10 +81,15 @@ export default function NieuweRitPage() {
             <select
               className="input"
               value={form.ride_type}
-              onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' })}
+              onChange={e => {
+                const type = e.target.value as 'mtb' | 'gravel' | 'baanrit';
+                const isRanking = type === 'mtb';
+                setForm({ ...form, ride_type: type, in_ranking: isRanking, points: isRanking ? 2 : 0 });
+              }}
             >
               <option value="mtb">MTB</option>
               <option value="gravel">Gravel</option>
+              <option value="baanrit">Training op de baan</option>
             </select>
           </div>
           <div>

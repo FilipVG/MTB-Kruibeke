@@ -127,15 +127,6 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             <input type="date" className="input" value={form.birthdate} onChange={e => setForm({ ...form, birthdate: e.target.value })} />
           </div>
         </div>
-        <div>
-          <label className="block text-sm text-ink-200 mb-1.5">Over mezelf</label>
-          <textarea
-            className="input min-h-[100px]"
-            value={form.bio}
-            onChange={e => setForm({ ...form, bio: e.target.value })}
-            placeholder="Vertel iets over jezelf, je fiets, je favoriete parcours..."
-          />
-        </div>
       </div>
 
       <div className="flex items-center justify-between">

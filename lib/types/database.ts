@@ -1,5 +1,5 @@
 export type UserRole = 'member' | 'admin';
-export type RideType = 'mtb' | 'gravel';
+export type RideType = 'mtb' | 'gravel' | 'baanrit';
 export type SponsorTier = 'main' | 'regular';
 
 export interface Profile {

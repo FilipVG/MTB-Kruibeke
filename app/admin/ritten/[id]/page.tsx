@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { formatRideDate } from '@/lib/utils';
+import { formatRideDate, toDatetimeLocal, fromDatetimeLocal } from '@/lib/utils';
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
 
 interface Registration {
@@ -24,7 +24,7 @@ interface Ride {
   id: string;
   title: string;
   description: string | null;
-  ride_type: 'mtb' | 'gravel';
+  ride_type: 'mtb' | 'gravel' | 'baanrit';
   start_at: string;
   start_location: string;
   distance_km: number | null;
@@ -59,7 +59,7 @@ export default function RitBeheerPage() {
           title: r.title,
           description: r.description ?? '',
           ride_type: r.ride_type,
-          start_at: r.start_at.slice(0, 16),
+          start_at: toDatetimeLocal(r.start_at),
           start_location: r.start_location,
           distance_km: r.distance_km,
           gpx_url: r.gpx_url,
@@ -109,7 +109,7 @@ export default function RitBeheerPage() {
       ...form,
       description: form.description || null,
       distance_km: form.distance_km || null,
-      start_at: new Date(form.start_at).toISOString(),
+      start_at: fromDatetimeLocal(form.start_at),
       gpx_url,
     }).eq('id', id);
     setSaving(false);
@@ -183,9 +183,10 @@ export default function RitBeheerPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-ink-200 mb-1.5">Type</label>
-              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' })}>
+              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' | 'baanrit' })}>
                 <option value="mtb">MTB</option>
                 <option value="gravel">Gravel</option>
+                <option value="baanrit">Training op de baan</option>
               </select>
             </div>
             <div>

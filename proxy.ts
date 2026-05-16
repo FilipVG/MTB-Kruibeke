@@ -26,6 +26,25 @@ export async function proxy(request: NextRequest) {
   // Verplicht: ververst de sessie cookies
   const { data: { user } } = await supabase.auth.getUser();
 
+  // last_seen_at bijhouden — max. 1x per 15 min via cookie-throttle
+  if (user) {
+    const FIFTEEN_MIN = 15 * 60 * 1000;
+    const raw = request.cookies.get('ls_updated')?.value;
+    const lastUpdated = raw ? parseInt(raw, 10) : 0;
+    if (Date.now() - lastUpdated > FIFTEEN_MIN) {
+      await supabase
+        .from('profiles')
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq('id', user.id);
+      supabaseResponse.cookies.set('ls_updated', String(Date.now()), {
+        maxAge: 60 * 60,
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+      });
+    }
+  }
+
   const pathname = request.nextUrl.pathname;
 
   // Beschermde routes

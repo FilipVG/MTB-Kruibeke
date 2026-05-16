@@ -1,8 +1,20 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getInitials, getDisplayName } from '@/lib/utils';
-import { Shield, Phone, Mail } from 'lucide-react';
+import { getInitials, getDisplayName, cn } from '@/lib/utils';
+import { Shield, Phone, Mail, Clock, Check } from 'lucide-react';
 import Link from 'next/link';
+
+function formatLastSeen(dateStr: string | null | undefined): string {
+  if (!dateStr) return 'Nog nooit aangelogd';
+  return new Intl.DateTimeFormat('nl-BE', {
+    timeZone: 'Europe/Brussels',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(dateStr));
+}
 
 export default async function LidProfielPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,6 +28,24 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
     .single();
 
   if (!member) notFound();
+
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
+  const endOfYear = new Date(now.getFullYear() + 1, 0, 1).toISOString();
+
+  const { data: regData } = await supabase
+    .from('ride_registrations')
+    .select(`id, attended, ride:rides(id, title, start_at, points, in_ranking, cancelled)`)
+    .eq('user_id', id);
+
+  const ritten = (regData ?? [])
+    .filter((r: any) => {
+      if (!r.ride || r.ride.cancelled) return false;
+      const isGepland = r.ride.start_at >= now.toISOString();
+      const isDitJaar = r.ride.start_at >= startOfYear && r.ride.start_at < endOfYear;
+      return isGepland || (isDitJaar && r.attended === true);
+    })
+    .sort((a: any, b: any) => new Date(a.ride.start_at).getTime() - new Date(b.ride.start_at).getTime());
 
   return (
     <div className="mx-auto max-w-xl px-4 sm:px-6 py-12">
@@ -67,8 +97,46 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
               <a href={`tel:${member.phone}`} className="hover:text-white">{member.phone}</a>
             </div>
           )}
+          <div className="flex items-center gap-3 text-sm text-ink-400">
+            <Clock className="h-4 w-4 text-ink-500 shrink-0" />
+            <span>Laatste bezoek: {formatLastSeen(member.last_seen_at)}</span>
+          </div>
         </div>
       </div>
+      {ritten.length > 0 && (
+        <div className="card mt-6 px-4 py-2">
+          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide px-1 pt-3 pb-2">
+            Ritten {now.getFullYear()}
+          </p>
+          <div className="divide-y divide-ink-800">
+            {ritten.map((r: any) => {
+              const start = new Date(r.ride.start_at);
+              const isVoorbij = start < now;
+              const datumLabel = start.toLocaleDateString('nl-BE', {
+                timeZone: 'Europe/Brussels',
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+              });
+              return (
+                <div key={r.id} className={cn('flex items-center gap-3 py-2 px-1', isVoorbij && 'opacity-60')}>
+                  <span className="w-20 shrink-0 text-xs text-ink-400 capitalize">{datumLabel}</span>
+                  <Link href={`/kalender/${r.ride.id}`} className="flex-1 min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
+                    {r.ride.title}
+                  </Link>
+                  {r.ride.in_ranking && r.ride.points > 0 && (
+                    <span className="shrink-0 text-xs text-amber-400">{r.ride.points} pt</span>
+                  )}
+                  {isVoorbij
+                    ? r.attended && <Check className="h-3.5 w-3.5 shrink-0 text-green-400" />
+                    : <span className="shrink-0 text-xs text-ink-500">ingeschreven</span>
+                  }
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -78,8 +78,8 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-2">
-              <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : 'badge-gravel'}>
-                {ride.ride_type === 'mtb' ? 'MTB' : 'Gravel'}
+              <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : ride.ride_type === 'gravel' ? 'badge-gravel' : 'badge-baanrit'}>
+                {ride.ride_type === 'mtb' ? 'MTB' : ride.ride_type === 'gravel' ? 'Gravel' : 'Training'}
               </span>
               {ride.in_ranking && ride.points > 0 && (
                 isTopRit ? (

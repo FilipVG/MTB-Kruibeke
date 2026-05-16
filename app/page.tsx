@@ -45,11 +45,10 @@ export default async function HomePage() {
             Mountainbike club · Waasland
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-white max-w-3xl leading-[1.1]">
-            Samen rijden,<br />samen genieten.
+            Trappen en veel zeveren.
           </h1>
           <p className="mt-6 text-base sm:text-lg text-white/80 max-w-xl leading-relaxed">
-            Elke zondag een toertocht, dinsdag training. MTB en gravel in het
-            Waasland en daarbuiten. Geen competitie, wel vriendschap en vooruitgang.
+            Elken zondag nen toertocht, dinsdag (soms) training op de boan. MTB in 't Waasland en derbuiten. Gien competitie, mo wel kameroadschap en mekoar ies goe loate afzien noa de beveurrading.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/kalender" className="btn-primary bg-white text-brand-900 hover:bg-ink-100">
