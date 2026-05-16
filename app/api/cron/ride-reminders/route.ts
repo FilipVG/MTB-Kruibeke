@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
   const top3 = (ranking ?? []).slice(0, 3).map((e: any, i: number) => ({
     place: i + 1,
-    name: e.nickname ?? (`${e.first_name ?? ''} ${e.last_name ?? ''}`.trim() || 'Onbekend'),
+    name: e.nickname || (`${e.first_name ?? ''} ${e.last_name ?? ''}`.trim() || 'Onbekend'),
     total_points: e.total_points,
   }));
 
