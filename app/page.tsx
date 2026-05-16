@@ -37,7 +37,7 @@ export default async function HomePage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden hidden sm:block">
         <div className="absolute inset-0 bg-brand-gradient opacity-95" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-950" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-20 md:py-28">
