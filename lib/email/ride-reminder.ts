@@ -40,6 +40,12 @@ function rideTypeLabel(type: string): string {
   return 'Training op de baan';
 }
 
+function rideTypeEmoji(type: string): string {
+  if (type === 'mtb') return '🚵';
+  if (type === 'gravel') return '🚴';
+  return '🏁';
+}
+
 export function buildRideReminderEmail(
   ride: RideInfo,
   top3: RankingEntry[],
@@ -199,7 +205,7 @@ export function buildRideReminderEmail(
 </html>`;
 
   return {
-    subject: `🚵 ${ride.title} — ${formatDate(ride.start_at)}`,
+    subject: `${rideTypeEmoji(ride.ride_type)} ${ride.title} — ${formatDate(ride.start_at)}`,
     html,
   };
 }
