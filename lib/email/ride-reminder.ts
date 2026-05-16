@@ -44,6 +44,7 @@ export function buildRideReminderEmail(
   ride: RideInfo,
   top3: RankingEntry[],
   siteUrl: string,
+  isRegistered = false,
 ): { subject: string; html: string } {
   const registerUrl = `${siteUrl}/kalender/${ride.id}`;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ride.start_location)}`;
@@ -132,9 +133,13 @@ export function buildRideReminderEmail(
         <!-- CTA -->
         <tr>
           <td style="padding:0 32px 32px;text-align:center;">
-            <a href="${registerUrl}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
+            ${isRegistered
+              ? `<a href="${registerUrl}" style="display:inline-block;background:#15803d;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
+              ✓ Al ingeschreven
+            </a>`
+              : `<a href="${registerUrl}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
               Inschrijven voor deze rit →
-            </a>
+            </a>`}
           </td>
         </tr>
 
