@@ -45,6 +45,7 @@ export function buildRideReminderEmail(
   top3: RankingEntry[],
   siteUrl: string,
   isRegistered = false,
+  registeredNames: string[] = [],
 ): { subject: string; html: string } {
   const registerUrl = `${siteUrl}/kalender/${ride.id}`;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ride.start_location)}`;
@@ -138,8 +139,28 @@ export function buildRideReminderEmail(
               ✓ Al ingeschreven
             </a>`
               : `<a href="${registerUrl}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
-              Ik kom af!
+              Ik kom af! →
             </a>`}
+          </td>
+        </tr>
+
+        <!-- Ingeschrevenen -->
+        <tr>
+          <td style="padding:0 32px 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+              <tr>
+                <td style="background:#f9fafb;padding:12px 16px;border-bottom:1px solid #e5e7eb;">
+                  <p style="margin:0;font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.1em;">✅ Ingeschreven (${registeredNames.length})</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 16px;">
+                  ${registeredNames.length > 0
+                    ? registeredNames.map(name => `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:13px;font-weight:600;padding:4px 10px;border-radius:20px;margin:3px 3px;">${name}</span>`).join('')
+                    : '<p style="margin:0;font-size:14px;color:#888;font-style:italic;">Nog niemand ingeschreven.</p>'}
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 

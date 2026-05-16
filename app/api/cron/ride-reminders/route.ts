@@ -54,18 +54,22 @@ export async function GET(request: Request) {
   let totalSent = 0;
 
   for (const ride of rides) {
-    // Haal inschrijvingen op voor deze rit
+    // Haal inschrijvingen op voor deze rit (inclusief naam)
     const { data: registrations } = await supabase
       .from('ride_registrations')
-      .select('profile_id')
+      .select('profile_id, profiles(first_name, last_name, nickname)')
       .eq('ride_id', ride.id);
 
     const registeredIds = new Set((registrations ?? []).map((r: any) => r.profile_id));
+    const registeredNames = (registrations ?? []).map((r: any) => {
+      const p = r.profiles as any;
+      return p?.nickname || (`${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || 'Onbekend');
+    });
 
     // Bouw per lid een gepersonaliseerde mail
     const emails = members.map((m: any) => {
       const isRegistered = registeredIds.has(m.id);
-      const { subject, html } = buildRideReminderEmail(ride, top3, siteUrl, isRegistered);
+      const { subject, html } = buildRideReminderEmail(ride, top3, siteUrl, isRegistered, registeredNames);
       return { from, to: m.email, subject, html };
     });
 
