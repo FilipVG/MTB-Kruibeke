@@ -57,12 +57,12 @@ export async function GET(request: Request) {
     // Haal inschrijvingen op voor deze rit (inclusief naam)
     const { data: registrations } = await supabase
       .from('ride_registrations')
-      .select('profile_id, profiles(first_name, last_name, nickname)')
+      .select('user_id, profile:profiles(first_name, last_name, nickname)')
       .eq('ride_id', ride.id);
 
-    const registeredIds = new Set((registrations ?? []).map((r: any) => r.profile_id));
+    const registeredIds = new Set((registrations ?? []).map((r: any) => r.user_id));
     const registeredNames = (registrations ?? []).map((r: any) => {
-      const p = r.profiles as any;
+      const p = r.profile as any;
       return p?.nickname || (`${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || 'Onbekend');
     });
 
