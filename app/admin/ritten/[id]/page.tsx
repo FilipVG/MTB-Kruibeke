@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { formatRideDate, toDatetimeLocal, fromDatetimeLocal } from '@/lib/utils';
+
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
 
 interface Registration {
@@ -33,6 +34,7 @@ interface Ride {
   points: number;
   registration_open: boolean;
   cancelled: boolean;
+  reminder_at: string | null;
 }
 
 export default function RitBeheerPage() {
@@ -67,6 +69,7 @@ export default function RitBeheerPage() {
           points: r.points,
           registration_open: r.registration_open,
           cancelled: r.cancelled,
+          reminder_at: r.reminder_at ? toDatetimeLocal(r.reminder_at) : '',
         });
       }
       const { data: regs } = await supabase
@@ -110,6 +113,7 @@ export default function RitBeheerPage() {
       description: form.description || null,
       distance_km: form.distance_km || null,
       start_at: fromDatetimeLocal(form.start_at),
+        reminder_at: form.reminder_at ? fromDatetimeLocal(form.reminder_at) : null,
       gpx_url,
     }).eq('id', id);
     setSaving(false);
@@ -193,6 +197,11 @@ export default function RitBeheerPage() {
               <label className="block text-sm text-ink-200 mb-1.5">Datum & uur</label>
               <input required type="datetime-local" className="input" value={form.start_at} onChange={e => setForm({ ...form, start_at: e.target.value })} />
             </div>
+          </div>
+          <div>
+            <label className="block text-sm text-ink-200 mb-1.5">Email versturen</label>
+            <input type="datetime-local" className="input" value={form.reminder_at ?? ''} onChange={e => setForm({ ...form, reminder_at: e.target.value })} />
+            <p className="text-xs text-ink-600 mt-1">Standaard 24u voor de start. Laat leeg om geen herinnering te sturen.</p>
           </div>
           <div>
             <label className="block text-sm text-ink-200 mb-1.5">Startlocatie</label>

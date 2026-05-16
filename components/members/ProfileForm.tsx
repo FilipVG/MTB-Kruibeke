@@ -19,6 +19,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     bio: profile.bio ?? '',
     phone: profile.phone ?? '',
     birthdate: profile.birthdate ?? '',
+    email_reminders: profile.email_reminders ?? true,
   });
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar_url);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
@@ -127,6 +128,23 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             <input type="date" className="input" value={form.birthdate} onChange={e => setForm({ ...form, birthdate: e.target.value })} />
           </div>
         </div>
+      </div>
+
+      {/* Voorkeuren */}
+      <div className="card p-6">
+        <h2 className="font-medium text-white mb-4">Voorkeuren</h2>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.email_reminders}
+            onChange={e => setForm({ ...form, email_reminders: e.target.checked })}
+            className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500 h-4 w-4"
+          />
+          <div>
+            <p className="text-sm text-ink-200">Stuur rituitnodiging</p>
+            <p className="text-xs text-ink-500">Ontvang een e-mail vóór elke rit om je in te schrijven.</p>
+          </div>
+        </label>
       </div>
 
       <div className="flex items-center justify-between">

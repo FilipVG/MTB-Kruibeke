@@ -14,6 +14,8 @@ export interface Profile {
   birthdate: string | null;
   role: UserRole;
   is_active: boolean;
+  email_reminders: boolean;
+  last_seen_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,6 +37,8 @@ export interface Ride {
   max_participants: number | null;
   cancelled: boolean;
   created_by: string | null;
+  reminder_at: string | null;
+  reminder_sent_at: string | null;
   created_at: string;
   updated_at: string;
 }
