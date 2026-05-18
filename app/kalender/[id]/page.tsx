@@ -32,12 +32,20 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
   const isTopRit = ride.in_ranking && ride.points === 5;
   const attendedCount = registrations.filter((r: any) => r.attended === true).length;
   const jokerritKwalificeert = ride.ride_type === 'jokerrit' && attendedCount >= 4;
+  const isOrganisator = ride.ride_type === 'jokerrit' && current?.user?.id === ride.created_by;
 
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
-      <Link href="/kalender" className="text-sm text-ink-400 hover:text-white mb-6 inline-flex items-center gap-1">
-        ← Kalender
-      </Link>
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/kalender" className="text-sm text-ink-400 hover:text-white inline-flex items-center gap-1">
+          ← Kalender
+        </Link>
+        {isOrganisator && (
+          <Link href={`/kalender/jokerrit/${id}/bewerken`} className="btn-secondary text-sm">
+            Bewerken
+          </Link>
+        )}
+      </div>
 
       <div className={cn(
         'card p-6 sm:p-8 mt-4 relative overflow-hidden',
@@ -76,7 +84,6 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
               </span>
             )
           )}
-          )}
           {ride.cancelled && (
             <span className="badge bg-red-900/40 text-red-200 border border-red-800">Afgelast</span>
           )}
@@ -88,7 +95,7 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
         </h1>
         {ride.ride_type === 'jokerrit' && ride.creator && (
           <p className="text-sm text-purple-300 mb-4">
-            🃏 Georganiseerd door{' '}
+            🤡 Georganiseerd door{' '}
             <span className="font-medium">
               {getDisplayName(ride.creator as Pick<Profile, 'nickname' | 'first_name' | 'last_name'>)}
             </span>

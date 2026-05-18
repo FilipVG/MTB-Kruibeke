@@ -2,24 +2,36 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fromDatetimeLocal, toDatetimeLocal } from '@/lib/utils';
+import { fromDatetimeLocal, defaultStartAt } from '@/lib/utils';
 
-function minStartAt(): string {
+function minStartDatetime(): string {
   const d = new Date();
-  d.setDate(d.getDate() + 7);
-  return toDatetimeLocal(d.toISOString());
+  d.setDate(d.getDate() + 5);
+  return d.toISOString().slice(0, 10) + 'T00:00';
 }
 
-export function JokerritForm() {
+interface Props {
+  rideId?: string;
+  initialValues?: {
+    title: string;
+    description: string;
+    start_at: string; // datetime-local formaat
+    start_location: string;
+    distance_km: string;
+  };
+}
+
+export function JokerritForm({ rideId, initialValues }: Props) {
   const router = useRouter();
+  const isEdit = !!rideId;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    start_at: '',
-    start_location: '',
-    distance_km: '',
+    title: initialValues?.title ?? '',
+    description: initialValues?.description ?? '',
+    start_at: initialValues?.start_at ?? defaultStartAt(5),
+    start_location: initialValues?.start_location ?? '',
+    distance_km: initialValues?.distance_km ?? '',
   });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,14 +39,17 @@ export function JokerritForm() {
     setSaving(true);
     setError(null);
 
-    const res = await fetch('/api/kalender/jokerrit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        start_at: fromDatetimeLocal(form.start_at),
-      }),
-    });
+    const res = await fetch(
+      isEdit ? `/api/kalender/jokerrit/${rideId}` : '/api/kalender/jokerrit',
+      {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          start_at: fromDatetimeLocal(form.start_at),
+        }),
+      }
+    );
 
     const json = await res.json();
     setSaving(false);
@@ -44,7 +59,8 @@ export function JokerritForm() {
       return;
     }
 
-    router.push(`/kalender/${json.id}`);
+    router.push(`/kalender/${isEdit ? rideId : json.id}`);
+    router.refresh();
   }
 
   return (
@@ -67,11 +83,11 @@ export function JokerritForm() {
             required
             type="datetime-local"
             className="input"
-            min={minStartAt()}
+            min={minStartDatetime()}
             value={form.start_at}
             onChange={e => setForm({ ...form, start_at: e.target.value })}
           />
-          <p className="text-xs text-ink-600 mt-1">Minstens 1 week in de toekomst.</p>
+          <p className="text-xs text-ink-600 mt-1">Minstens 5 dagen in de toekomst.</p>
         </div>
         <div>
           <label className="block text-sm text-ink-200 mb-1.5">Afstand (km, optioneel)</label>
@@ -108,7 +124,7 @@ export function JokerritForm() {
       </div>
 
       <div className="rounded-lg bg-purple-950/30 border border-purple-800/40 p-4 text-sm text-purple-200 space-y-1">
-        <p className="font-medium">🃏 Jokerrit</p>
+        <p className="font-medium">🤡 Jokerrit</p>
         <p className="text-xs text-purple-300">Telt voor 2 punten in het klassement als minstens 4 leden bevestigd aanwezig waren. Een herinneringsmail wordt automatisch 2 dagen voor de rit verstuurd.</p>
       </div>
 
@@ -123,7 +139,7 @@ export function JokerritForm() {
           Annuleren
         </button>
         <button type="submit" disabled={saving} className="btn-primary">
-          {saving ? 'Aanmaken…' : 'Jokerrit aanmaken'}
+          {saving ? (isEdit ? 'Opslaan…' : 'Aanmaken…') : (isEdit ? 'Wijzigingen opslaan' : 'Jokerrit aanmaken')}
         </button>
       </div>
     </form>

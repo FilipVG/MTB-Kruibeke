@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { defaultStartAt } from '@/lib/utils';
 
 export default function NieuweActiviteitPage() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export default function NieuweActiviteitPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    start_at: '',
+    start_at: defaultStartAt(1),
     end_at: '',
     location: '',
     registration_required: false,

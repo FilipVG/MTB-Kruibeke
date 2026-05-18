@@ -50,7 +50,8 @@ export default function RitBeheerPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [gpxFile, setGpxFile] = useState<File | null>(null);
   const [allMembers, setAllMembers] = useState<Member[]>([]);
-  const [addMemberId, setAddMemberId] = useState('');
+  const [addMemberIds, setAddMemberIds] = useState<string[]>([]);
+  const [memberSearch, setMemberSearch] = useState('');
   const [sendReminder, setSendReminder] = useState(true);
   const [daysBefore, setDaysBefore] = useState(2);
 
@@ -138,23 +139,21 @@ export default function RitBeheerPage() {
     setRegistrations(prev => prev.filter(r => r.id !== regId));
   }
 
-  async function addMember() {
-    if (!addMemberId) return;
-    const member = allMembers.find(m => m.id === addMemberId);
-    if (!member) return;
+  async function addMembers() {
+    if (addMemberIds.length === 0) return;
+    const rows = addMemberIds.map(uid => ({ ride_id: id, user_id: uid }));
     const { data, error } = await supabase
       .from('ride_registrations')
-      .insert({ ride_id: id, user_id: addMemberId })
-      .select('id, attended, user_id')
-      .single();
+      .insert(rows)
+      .select('id, attended, user_id');
     if (!error && data) {
-      setRegistrations(prev => [...prev, {
-        id: data.id,
-        attended: data.attended,
-        user_id: data.user_id,
-        profile: { first_name: member.first_name, last_name: member.last_name, nickname: member.nickname },
-      }]);
-      setAddMemberId('');
+      const newRegs: Registration[] = data.map(d => {
+        const member = allMembers.find(m => m.id === d.user_id)!;
+        return { id: d.id, attended: d.attended, user_id: d.user_id, profile: { first_name: member.first_name, last_name: member.last_name, nickname: member.nickname } };
+      });
+      setRegistrations(prev => [...prev, ...newRegs]);
+      setAddMemberIds([]);
+      setMemberSearch('');
     }
   }
 
@@ -339,33 +338,62 @@ export default function RitBeheerPage() {
           </div>
         )}
 
-        {/* Lid toevoegen */}
+        {/* Leden toevoegen */}
         <div className="border-t border-ink-800 pt-4">
-          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-2">Lid toevoegen</p>
-          <div className="flex gap-2">
-            <select
-              className="input flex-1"
-              value={addMemberId}
-              onChange={e => setAddMemberId(e.target.value)}
-            >
-              <option value="">— Kies een lid —</option>
-              {allMembers
-                .filter(m => !registrations.some(r => r.user_id === m.id))
-                .map(m => (
-                  <option key={m.id} value={m.id}>
-                    {m.nickname || [m.first_name, m.last_name].filter(Boolean).join(' ')}
-                  </option>
-                ))}
-            </select>
-            <button
-              onClick={addMember}
-              disabled={!addMemberId}
-              className="btn-secondary disabled:opacity-40 shrink-0"
-            >
-              <UserPlus className="h-4 w-4" />
-              Toevoegen
-            </button>
-          </div>
+          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-2">Leden toevoegen</p>
+          {(() => {
+            const available = allMembers.filter(m => !registrations.some(r => r.user_id === m.id));
+            const filtered = available.filter(m => {
+              const name = (m.nickname || [m.first_name, m.last_name].filter(Boolean).join(' ')).toLowerCase();
+              return name.includes(memberSearch.toLowerCase());
+            });
+            return available.length === 0 ? (
+              <p className="text-sm text-ink-500">Alle leden zijn al ingeschreven.</p>
+            ) : (
+              <div className="space-y-2">
+                <input
+                  className="input"
+                  placeholder="Zoek op naam…"
+                  value={memberSearch}
+                  onChange={e => setMemberSearch(e.target.value)}
+                />
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-ink-800 divide-y divide-ink-800">
+                  {filtered.length === 0 ? (
+                    <p className="text-sm text-ink-500 p-3">Geen resultaten.</p>
+                  ) : filtered.map(m => {
+                    const name = m.nickname || [m.first_name, m.last_name].filter(Boolean).join(' ');
+                    const checked = addMemberIds.includes(m.id);
+                    return (
+                      <label key={m.id} className="flex items-center gap-3 px-3 py-2 hover:bg-ink-800 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => setAddMemberIds(prev =>
+                            checked ? prev.filter(id => id !== m.id) : [...prev, m.id]
+                          )}
+                          className="rounded border-ink-700 bg-ink-900 text-brand-700"
+                        />
+                        <span className="text-sm text-ink-200">{name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-ink-500">
+                    {addMemberIds.length > 0 ? `${addMemberIds.length} geselecteerd` : 'Niemand geselecteerd'}
+                  </span>
+                  <button
+                    onClick={addMembers}
+                    disabled={addMemberIds.length === 0}
+                    className="btn-secondary disabled:opacity-40"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    {addMemberIds.length > 1 ? `${addMemberIds.length} leden toevoegen` : 'Toevoegen'}
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 

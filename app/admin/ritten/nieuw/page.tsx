@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
+import { fromDatetimeLocal, computeReminderAt, validateGpxFile, defaultStartAt } from '@/lib/utils';
 
 export default function NieuweRitPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function NieuweRitPage() {
     title: '',
     description: '',
     ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit',
-    start_at: '',
+    start_at: defaultStartAt(1),
     start_location: '',
     distance_km: '',
     in_ranking: true,

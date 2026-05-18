@@ -60,7 +60,7 @@ export function rideTypeLabel(type: string): string {
 export function rideTypeEmoji(type: string): string {
   if (type === 'mtb') return '🚵';
   if (type === 'gravel') return '🚴';
-  if (type === 'jokerrit') return '🃏';
+  if (type === 'jokerrit') return '🤡';
   return '🏁';
 }
 
@@ -85,6 +85,17 @@ export function validateGpxFile(file: File): string | null {
   if (file.name.split('.').pop()?.toLowerCase() !== 'gpx') return 'Enkel GPX-bestanden zijn toegestaan.';
   if (file.size > MAX_GPX_BYTES) return 'Bestand mag maximaal 5 MB zijn.';
   return null;
+}
+
+// Geeft een standaard startdatum terug als "YYYY-MM-DDTHH:mm" in Brussels-tijd, standaard 09:00
+export function defaultStartAt(daysAhead = 1): string {
+  const d = new Date();
+  d.setDate(d.getDate() + daysAhead);
+  const datePart = new Intl.DateTimeFormat('sv', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(d);
+  return `${datePart}T09:00`;
 }
 
 // Converteert UTC ISO-string naar "YYYY-MM-DDTHH:mm" in Brussels-tijd (voor datetime-local input)

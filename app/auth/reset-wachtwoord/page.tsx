@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 
 export default function ResetWachtwoordPage() {
   const router = useRouter();
@@ -10,6 +11,25 @@ export default function ResetWachtwoordPage() {
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // PKCE flow: sessie al gezet via callback → cookie aanwezig
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+
+    // Hash-fragment / implicit flow: Supabase vuurt PASSWORD_RECOVERY
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+        setReady(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,6 +57,16 @@ export default function ResetWachtwoordPage() {
     router.push('/profiel?wachtwoord=gewijzigd');
   }
 
+  if (!ready) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16">
+        <div className="card p-8 text-center text-ink-400">
+          Even geduld, sessie wordt geladen…
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <div className="card p-8">
@@ -46,24 +76,20 @@ export default function ResetWachtwoordPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-ink-200 mb-1.5">Nieuw wachtwoord</label>
-            <input
-              type="password"
+            <PasswordInput
               required
               minLength={8}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="input"
               autoFocus
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-ink-200 mb-1.5">Bevestig wachtwoord</label>
-            <input
-              type="password"
+            <PasswordInput
               required
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
-              className="input"
             />
           </div>
 

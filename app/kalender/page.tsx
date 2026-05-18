@@ -94,7 +94,7 @@ export default async function KalenderPage({ searchParams }: Props) {
         <div className="flex items-center gap-2 flex-wrap justify-end">
           {current && (
             <Link href="/kalender/jokerrit/nieuw" className="btn-secondary">
-              🃏 Organiseer Jokerrit
+              🤡 Organiseer Jokerrit
             </Link>
           )}
           <AbonneerKnop url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtb-kruibeke.vercel.app'}/api/calendar.ics`} />

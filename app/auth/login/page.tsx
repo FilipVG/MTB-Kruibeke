@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,13 +60,11 @@ export default function LoginPage() {
                 Vergeten?
               </Link>
             </div>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="input"
             />
           </div>
 
