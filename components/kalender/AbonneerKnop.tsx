@@ -19,7 +19,7 @@ export function AbonneerKnop({ url }: { url: string }) {
     <div className="relative">
       <button onClick={() => setOpen(!open)} className="btn-secondary">
         <CalendarDays className="h-4 w-4" />
-        Abonneer op kalender
+        <span className="hidden sm:inline">Abonneer op </span>Kalender
       </button>
 
       {open && (

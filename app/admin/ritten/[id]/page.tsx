@@ -52,6 +52,8 @@ export default function RitBeheerPage() {
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [addMemberIds, setAddMemberIds] = useState<string[]>([]);
   const [memberSearch, setMemberSearch] = useState('');
+  const [sendingInvite, setSendingInvite] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
   const [sendReminder, setSendReminder] = useState(true);
   const [daysBefore, setDaysBefore] = useState(2);
 
@@ -155,6 +157,15 @@ export default function RitBeheerPage() {
       setAddMemberIds([]);
       setMemberSearch('');
     }
+  }
+
+  async function sendInvite() {
+    setSendingInvite(true);
+    setInviteMessage(null);
+    const res = await fetch(`/api/admin/ritten/${id}/uitnodiging`, { method: 'POST' });
+    const json = await res.json();
+    setSendingInvite(false);
+    setInviteMessage(res.ok ? `Uitnodiging verstuurd naar ${json.sent} leden.` : (json.error ?? 'Fout'));
   }
 
   async function handleDelete() {
@@ -394,6 +405,24 @@ export default function RitBeheerPage() {
               </div>
             );
           })()}
+        </div>
+      </section>
+
+      {/* Uitnodiging versturen */}
+      <section className="card p-6">
+        <h2 className="font-semibold text-white text-lg mb-1">Uitnodiging versturen</h2>
+        <p className="text-sm text-ink-400 mb-4">
+          Stuur de rituitnodiging onmiddellijk naar alle actieve leden die uitnodigingen hebben ingeschakeld.
+        </p>
+        <div className="flex items-center gap-4">
+          <button onClick={sendInvite} disabled={sendingInvite} className="btn-secondary disabled:opacity-40">
+            {sendingInvite ? 'Versturen…' : 'Verstuur uitnodiging'}
+          </button>
+          {inviteMessage && (
+            <p className={`text-sm ${inviteMessage.startsWith('Fout') ? 'text-red-400' : 'text-green-400'}`}>
+              {inviteMessage}
+            </p>
+          )}
         </div>
       </section>
 

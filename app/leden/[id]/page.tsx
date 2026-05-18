@@ -35,7 +35,7 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
 
   const { data: regData } = await supabase
     .from('ride_registrations')
-    .select(`id, attended, ride:rides(id, title, start_at, points, in_ranking, cancelled)`)
+    .select(`id, attended, ride:rides(id, title, start_at, points, in_ranking, cancelled, ride_type)`)
     .eq('user_id', id);
 
   const ritten = (regData ?? [])
@@ -46,6 +46,20 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
       return isGepland || (isDitJaar && r.attended === true);
     })
     .sort((a: any, b: any) => new Date(a.ride.start_at).getTime() - new Date(b.ride.start_at).getTime());
+
+  // Jokerrits tellen enkel als minstens 4 leden aanwezig waren
+  const jokerritIds = ritten.filter((r: any) => r.ride.ride_type === 'jokerrit').map((r: any) => r.ride.id);
+  const qualifiedJokerrits = new Set<string>();
+  if (jokerritIds.length > 0) {
+    const { data: attended } = await supabase
+      .from('ride_registrations')
+      .select('ride_id')
+      .in('ride_id', jokerritIds)
+      .eq('attended', true);
+    const counts = new Map<string, number>();
+    for (const row of attended ?? []) counts.set(row.ride_id, (counts.get(row.ride_id) ?? 0) + 1);
+    for (const [rideId, count] of counts) if (count >= 4) qualifiedJokerrits.add(rideId);
+  }
 
   return (
     <div className="mx-auto max-w-xl px-4 sm:px-6 py-12">
@@ -124,9 +138,15 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
                   <Link href={`/kalender/${r.ride.id}`} className="flex-1 min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
                     {r.ride.title}
                   </Link>
-                  {r.ride.in_ranking && r.ride.points > 0 && (
-                    <span className="shrink-0 text-xs text-amber-400">{r.ride.points} pt</span>
-                  )}
+                  {r.ride.in_ranking && (() => {
+                    const isJokerrit = r.ride.ride_type === 'jokerrit';
+                    const pts = isJokerrit && !qualifiedJokerrits.has(r.ride.id) ? 0 : r.ride.points;
+                    return pts > 0
+                      ? <span className="shrink-0 text-xs text-amber-400">{pts} pt</span>
+                      : isJokerrit
+                        ? <span className="shrink-0 text-xs text-ink-600">0 pt</span>
+                        : null;
+                  })()}
                   {isVoorbij
                     ? r.attended && <Check className="h-3.5 w-3.5 shrink-0 text-green-400" />
                     : <span className="shrink-0 text-xs text-ink-500">ingeschreven</span>

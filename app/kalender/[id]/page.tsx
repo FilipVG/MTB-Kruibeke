@@ -4,6 +4,7 @@ import { Calendar, MapPin, Trophy, Download, Users, Star } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatRideDate, getDisplayName, getInitials, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { RegistrationButton } from '@/components/rides/RegistrationButton';
+import { RideReviews } from '@/components/rides/RideReviews';
 import type { Profile } from '@/lib/types/database';
 
 export default async function RitDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,6 +34,15 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
   const attendedCount = registrations.filter((r: any) => r.attended === true).length;
   const jokerritKwalificeert = ride.ride_type === 'jokerrit' && attendedCount >= 4;
   const isOrganisator = ride.ride_type === 'jokerrit' && current?.user?.id === ride.created_by;
+  const isPastRide = new Date(ride.start_at) < new Date();
+
+  const { data: reviewsData } = isPastRide && current
+    ? await supabase
+        .from('ride_reviews')
+        .select('id, score, comment, created_at, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url)')
+        .eq('ride_id', id)
+        .order('created_at', { ascending: false })
+    : { data: [] };
 
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
@@ -157,6 +167,15 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
           </div>
         )}
       </div>
+
+      {/* Reviews — enkel voor afgelopen ritten, zichtbaar voor ingelogde leden */}
+      {current && isPastRide && (
+        <RideReviews
+          rideId={id}
+          initialReviews={(reviewsData ?? []) as any}
+          currentUserId={current.user.id}
+        />
+      )}
 
       {/* Ingeschrevenen — enkel voor ingelogde leden */}
       {current && (

@@ -78,8 +78,10 @@ export default async function KlassementPage({ searchParams }: Props) {
                   2: 'bg-slate-400/20 border-slate-300',
                   3: 'bg-orange-700/20 border-orange-600',
                 } as const;
+                const medals = { 1: '🥇', 2: '🥈', 3: '🥉' } as const;
                 return (
                   <div key={entry.id} className="text-center">
+                    <div className="text-3xl mb-1">{medals[place as 1 | 2 | 3]}</div>
                     <Avatar entry={entry} size="lg" />
                     <p className="mt-2 text-sm font-medium text-white truncate">{getDisplayName(entry)}</p>
                     <p className={cn('text-xs font-medium', place === 1 ? 'text-yellow-400' : place === 2 ? 'text-slate-300' : 'text-orange-500')}>
@@ -106,10 +108,11 @@ export default async function KlassementPage({ searchParams }: Props) {
           <div className="card divide-y divide-ink-800">
             {(podium.length < 3 ? entries : rest).map((entry, idx) => {
               const place = podium.length < 3 ? idx + 1 : idx + 4;
+              const medal = place === 1 ? '🥇' : place === 2 ? '🥈' : place === 3 ? '🥉' : null;
               return (
                 <div key={entry.id} className="flex items-center gap-4 p-3 sm:p-4">
                   <span className="w-8 text-center text-sm font-medium text-ink-400">
-                    {place}
+                    {medal ?? place}
                   </span>
                   <Avatar entry={entry} size="sm" />
                   <div className="flex-1 min-w-0">
