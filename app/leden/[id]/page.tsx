@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { getInitials, getDisplayName, cn } from '@/lib/utils';
-import { Shield, Phone, Mail, Clock, Check } from 'lucide-react';
+import { Shield, Phone, Mail, Clock, Check, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 function formatLastSeen(dateStr: string | null | undefined): string {
@@ -19,6 +19,7 @@ function formatLastSeen(dateStr: string | null | undefined): string {
 export default async function LidProfielPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const current = await getCurrentUser();
 
   const { data: member } = await supabase
     .from('profiles')
@@ -115,6 +116,15 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
             <Clock className="h-4 w-4 text-ink-500 shrink-0" />
             <span>Laatste bezoek: {formatLastSeen(member.last_seen_at)}</span>
           </div>
+          {member.vwb_card_url && (current?.user.id === id || current?.profile?.role === 'admin') && (
+            <Link
+              href={`/leden/${id}/lidkaart`}
+              className="flex items-center gap-3 text-sm text-ink-300 hover:text-white transition"
+            >
+              <CreditCard className="h-4 w-4 text-ink-500 shrink-0" />
+              VWB Lidkaart bekijken
+            </Link>
+          )}
         </div>
       </div>
       {ritten.length > 0 && (

@@ -10,6 +10,7 @@ export interface Profile {
   nickname: string | null;
   bio: string | null;
   avatar_url: string | null;
+  vwb_card_url: string | null;
   phone: string | null;
   birthdate: string | null;
   role: UserRole;

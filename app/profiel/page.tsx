@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser, createClient } from '@/lib/supabase/server';
 import { ProfileForm } from '@/components/members/ProfileForm';
 import { MijnRitten } from '@/components/profiel/MijnRitten';
+import { VwbCardUpload } from '@/components/members/VwbCardUpload';
 
 export const metadata = { title: 'Mijn profiel — MTB Kruibeke' };
 
@@ -47,6 +48,12 @@ export default async function ProfielPage() {
         <div className="card px-4 py-2">
           <MijnRitten ritten={ritten} userId={current.user.id} />
         </div>
+      </div>
+
+      <div>
+        <h2 className="text-xl font-semibold text-white mb-1">VWB Lidkaart</h2>
+        <p className="text-sm text-ink-400 mb-4">Upload een foto of scan van je VWB-lidkaart. Alleen zichtbaar voor jou en de admin.</p>
+        <VwbCardUpload profileId={current.user.id} hasCard={!!current.profile.vwb_card_url} />
       </div>
     </div>
   );
