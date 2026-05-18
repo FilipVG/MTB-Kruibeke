@@ -6,14 +6,18 @@
   - [Inloggen](#inloggen)
   - [Wachtwoord vergeten](#wachtwoord-vergeten)
   - [Mijn profiel](#mijn-profiel)
+  - [VWB Lidkaart](#vwb-lidkaart)
   - [Kalender](#kalender)
   - [Inschrijven voor een rit](#inschrijven-voor-een-rit)
+  - [Jokerrit organiseren](#jokerrit-organiseren)
+  - [Rit beoordelen](#rit-beoordelen)
   - [Kalender abonneren](#kalender-abonneren)
   - [Klassement](#klassement)
   - [Wie is wie](#wie-is-wie)
 - [Adminhandleiding](#adminhandleiding)
   - [Ritten beheren](#ritten-beheren)
   - [Aanwezigheid markeren](#aanwezigheid-markeren)
+  - [Rituitnodiging versturen](#rituitnodiging-versturen)
   - [Activiteiten beheren](#activiteiten-beheren)
   - [Leden beheren](#leden-beheren)
   - [Sponsors beheren](#sponsors-beheren)
@@ -30,6 +34,8 @@
 3. Klik op **Inloggen**.
 
 Je sessie blijft actief zolang je de site regelmatig bezoekt. Je wordt pas uitgelogd als je zelf klikt op **Uitloggen** (rechtsboven).
+
+> Klik op het oogje naast het wachtwoordveld om het wachtwoord zichtbaar te maken.
 
 ---
 
@@ -53,14 +59,30 @@ Via **Mijn profiel** (rechtsboven na inloggen) kan je:
 - Je **voornaam, familienaam en roepnaam** aanpassen
 - Je **telefoonnummer** aanpassen
 - Je **geboortedatum** aanpassen
-- Je **profielfoto** uploaden of wijzigen (klik op het camera-icoontje)
+- Je **profielfoto** uploaden of wijzigen (klik op "Foto kiezen", daarna bijsnijden)
+- Je **voorkeur voor e-mailuitnodigingen** instellen (aan/uit)
 
-Klik op **Opslaan** om wijzigingen te bewaren.
+Klik op **Wijzigingen opslaan** om op te slaan.
 
-Onderaan de profielpagina zie je een overzicht van **jouw ritten dit jaar**:
+**Mijn ritten dit jaar** toont:
 - Toekomstige ritten waarvoor je ingeschreven bent — met een **Uitschrijven**-knop
 - Ritten waaraan je hebt deelgenomen (groen vinkje)
 - Ritten met punten tonen het aantal punten in het oranje
+
+---
+
+### VWB Lidkaart
+
+Onderaan **Mijn profiel** kan je je VWB-lidkaart uploaden:
+
+1. Klik op **Lidkaart uploaden**.
+2. Kies een foto of scan van je lidkaart (JPG, PNG of WebP).
+3. Snij de afbeelding bij op creditcardformaat en klik op **Bijsnijden & opslaan**.
+
+De kaart is enkel zichtbaar voor jou en de admin. Om de kaart te bekijken, klik op **VWB Lidkaart bekijken** op je ledenprofiel (via Leden → jouw naam).
+
+- **Lidkaart vervangen**: klik opnieuw op de uploadknop.
+- **Verwijderen**: klik op de knop **Verwijderen**.
 
 ---
 
@@ -74,10 +96,11 @@ De kalender vind je via het menu bovenaan. Je ziet alle geplande ritten en activ
 
 **Ritdetails** tonen:
 - Datum, startuur en startlocatie (klikbaar naar Google Maps)
-- Afstand en rittype (MTB / Gravel / Training)
+- Afstand en rittype (🚵 MTB / 🚴 Gravel / 🏁 Baanrit / 🤡 Jokerrit)
 - Of de rit meetelt voor het klassement en hoeveel punten
 - Wie er ingeschreven is
 - GPX-bestand om te downloaden (indien beschikbaar)
+- Beoordelingen van leden (na afloop van de rit)
 
 ---
 
@@ -94,6 +117,50 @@ Om je **uit te schrijven**:
 - Of ga naar **Mijn profiel** en klik op **Uitschrijven** naast de rit.
 
 > Inschrijven en uitschrijven is enkel mogelijk zolang de rit nog niet begonnen is en inschrijvingen open zijn.
+
+---
+
+### Jokerrit organiseren
+
+Elk lid kan zelf een **jokerrit** 🤡 organiseren. Dit is een spontane rit die je zelf plant en andere leden uitnodigt mee te rijden.
+
+#### Jokerrit aanmaken
+
+1. Ga naar **Kalender** → klik op **Organiseer jokerrit**.
+2. Vul in:
+   - **Titel**
+   - **Datum & startuur** (minstens 5 dagen in de toekomst)
+   - **Startlocatie**
+   - **Afstand** (optioneel)
+   - **Omschrijving** (optioneel)
+3. Klik op **Jokerrit aanmaken**.
+
+De jokerrit verschijnt meteen in de kalender. Andere leden kunnen zich inschrijven.
+
+> **Punten**: een jokerrit telt 2 punten mee voor het klassement, maar enkel als er minstens **4 leden aanwezig** waren.
+
+#### Jokerrit bewerken
+
+Als organizer kan je de jokerrit nog aanpassen:
+
+1. Ga naar de detailpagina van je jokerrit.
+2. Klik op **Bewerken**.
+3. Pas de gewenste velden aan en klik op **Wijzigingen opslaan**.
+
+> De 5-dagenregel blijft van toepassing: de startdatum moet minstens 5 dagen na de aanmaakdatum liggen.
+
+---
+
+### Rit beoordelen
+
+Na afloop van een rit kan je een **beoordeling** achterlaten:
+
+1. Ga naar de detailpagina van de afgelopen rit.
+2. Geef een score van 1 tot 5 sterren.
+3. Voeg optioneel een **commentaar** toe.
+4. Klik op **Beoordeling opslaan**.
+
+Alle beoordelingen zijn zichtbaar voor ingelogde leden. Je kan je eigen beoordeling achteraf aanpassen of verwijderen.
 
 ---
 
@@ -118,6 +185,8 @@ Het puntenklassement vind je via het menu. Punten worden toegekend als:
 1. De rit is aangemerkt als "telt voor klassement"
 2. De admin heeft je aanwezigheid bevestigd na de rit
 
+De top 3 krijgt een medaille: 🥇 🥈 🥉
+
 Bovenaan de pagina kan je een **jaar selecteren** om klassementen van vorige jaren te raadplegen. Het klassement wordt automatisch gereset op 1 januari.
 
 ---
@@ -129,6 +198,7 @@ Via **Leden** in het menu zie je alle actieve leden. Klik op een lid voor:
 - E-mailadres en telefoonnummer
 - Laatste bezoek aan de site
 - Ritten dit jaar (deelgenomen en geplande ritten)
+- **VWB Lidkaart bekijken** (link zichtbaar voor het lid zelf en admins)
 
 ---
 
@@ -146,7 +216,7 @@ Als administrator heb je toegang tot het **Admin center** via het menu bovenaan.
 2. Vul in:
    - **Titel**: naam van de rit
    - **Type**: MTB / Gravel / Training op de baan
-   - **Datum & startuur**: kies datum en tijd (Brussels tijdzone)
+   - **Datum & startuur**: kies datum en tijd (Brussels tijdzone, standaard 09:00)
    - **Startlocatie**: adres of plaatsnaam
    - **Afstand**: optioneel, in km
    - **Omschrijving**: extra info
@@ -171,7 +241,7 @@ Onderaan de bewerkingspagina vind je:
 #### Inschrijvingen beheren
 
 Op de bewerkingspagina van een rit zie je alle ingeschreven leden. Je kan:
-- Een lid **toevoegen** via het dropdown-menu onderaan de lijst.
+- **Meerdere leden tegelijk toevoegen**: typ in het zoekvak om te filteren, vink de gewenste leden aan en klik op **Toevoegen**.
 - Een lid **verwijderen** via het prullenbak-icoontje naast de naam.
 
 ---
@@ -186,6 +256,18 @@ Na een rit moet je de aanwezigheid bevestigen zodat punten worden toegekend.
 4. Een rood kruis = niet aanwezig.
 
 > Zonder aanwezigheidsmarkering worden er geen punten toegekend, ook al is de rit ingesteld als klassementsrit.
+
+---
+
+### Rituitnodiging versturen
+
+Je kan alle leden met e-mailmeldingen ingeschakeld een uitnodiging sturen voor een specifieke rit:
+
+1. Ga naar **Admin → Ritten** en klik op de rit.
+2. Scroll naar de sectie **Uitnodiging versturen**.
+3. Klik op **Stuur uitnodiging naar alle leden**.
+
+Leden ontvangen een e-mail met ritdetails en een directe link om in te schrijven. Leden die e-mailmeldingen hebben uitgeschakeld in hun profiel ontvangen geen mail.
 
 ---
 
@@ -217,10 +299,9 @@ Ga naar **Admin → Activiteiten**, klik op de activiteit en pas aan of verwijde
 
 1. Ga naar **Admin → Leden → Nieuw lid**.
 2. Vul voornaam, familienaam en e-mailadres in.
-3. Stel een tijdelijk wachtwoord in.
-4. Klik op **Lid aanmaken**.
+3. Klik op **Lid aanmaken**.
 
-Het lid ontvangt een account en kan meteen inloggen. Stuur daarna eventueel een wachtwoordresetlink door zodat het lid zelf een wachtwoord kan kiezen.
+Het lid ontvangt een activatielink per e-mail om een wachtwoord in te stellen. Je kan ook via de bewerkingspagina een wachtwoordresetlink genereren.
 
 #### Lid bewerken
 
@@ -290,3 +371,5 @@ Het klassement wordt automatisch berekend op basis van:
 Het klassement reset automatisch op **1 januari**. Vorige jaren blijven raadpleegbaar via de jaarselector op de klassementspagina.
 
 **Opgelet**: als je vergeet aanwezigheid te markeren, worden er geen punten toegekend. Dit kan je achteraf rechtzetten door alsnog de vinkjes in te stellen.
+
+> **Jokerrits**: tellen enkel mee als er minstens 4 leden aanwezig waren. Als organizer hoef je dit niet te beheren — de site berekent dit automatisch.
