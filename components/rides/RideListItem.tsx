@@ -193,12 +193,13 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {ride.registrations.map(reg => (
-                    <span
+                    <Link
                       key={reg.id}
-                      className="text-xs bg-ink-800 px-2.5 py-1 rounded-full text-ink-200"
+                      href={`/leden/${reg.profile.id}`}
+                      className="text-xs bg-ink-800 px-2.5 py-1 rounded-full text-ink-200 hover:text-white hover:bg-ink-700 transition"
                     >
                       {getDisplayName(reg.profile)}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>

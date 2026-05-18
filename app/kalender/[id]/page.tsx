@@ -5,18 +5,12 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatRideDate, getDisplayName, getInitials, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { RegistrationButton } from '@/components/rides/RegistrationButton';
 import { RideReviews } from '@/components/rides/RideReviews';
-import type { Profile } from '@/lib/types/database';
+import type { Profile, RegistrationWithProfile } from '@/lib/types/database';
 
 export default async function RitDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const current = await getCurrentUser();
-
-  type Registration = {
-    id: string;
-    user_id: string;
-    profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'>;
-  };
 
   const { data: ride } = await supabase
     .from('rides')
@@ -26,7 +20,7 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
 
   if (!ride) notFound();
 
-  const registrations: Registration[] = ride.registrations ?? [];
+  const registrations: RegistrationWithProfile[] = ride.registrations ?? [];
   const isRegistered = current?.user
     ? registrations.some(r => r.user_id === current.user.id)
     : false;
@@ -106,9 +100,9 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
         {ride.ride_type === 'jokerrit' && ride.creator && (
           <p className="text-sm text-purple-300 mb-4">
             🤡 Georganiseerd door{' '}
-            <span className="font-medium">
+            <Link href={`/leden/${(ride.creator as any).id}`} className="font-medium hover:text-white transition">
               {getDisplayName(ride.creator as Pick<Profile, 'nickname' | 'first_name' | 'last_name'>)}
-            </span>
+            </Link>
           </p>
         )}
 

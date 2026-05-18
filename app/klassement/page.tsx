@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Trophy } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getInitials, getDisplayName, cn } from '@/lib/utils';
@@ -82,8 +83,10 @@ export default async function KlassementPage({ searchParams }: Props) {
                 return (
                   <div key={entry.id} className="text-center">
                     <div className="text-3xl mb-1">{medals[place as 1 | 2 | 3]}</div>
-                    <Avatar entry={entry} size="lg" />
-                    <p className="mt-2 text-sm font-medium text-white truncate">{getDisplayName(entry)}</p>
+                    <Link href={`/leden/${entry.id}`}>
+                      <Avatar entry={entry} size="lg" />
+                    </Link>
+                    <Link href={`/leden/${entry.id}`} className="mt-2 text-sm font-medium text-white truncate hover:text-brand-300 transition block">{getDisplayName(entry)}</Link>
                     <p className={cn('text-xs font-medium', place === 1 ? 'text-yellow-400' : place === 2 ? 'text-slate-300' : 'text-orange-500')}>
                       {entry.total_points} pt
                     </p>
@@ -110,7 +113,7 @@ export default async function KlassementPage({ searchParams }: Props) {
               const place = podium.length < 3 ? idx + 1 : idx + 4;
               const medal = place === 1 ? '🥇' : place === 2 ? '🥈' : place === 3 ? '🥉' : null;
               return (
-                <div key={entry.id} className="flex items-center gap-4 p-3 sm:p-4">
+                <Link key={entry.id} href={`/leden/${entry.id}`} className="flex items-center gap-4 p-3 sm:p-4 hover:bg-ink-800/40 transition">
                   <span className="w-8 text-center text-sm font-medium text-ink-400">
                     {medal ?? place}
                   </span>
@@ -122,7 +125,7 @@ export default async function KlassementPage({ searchParams }: Props) {
                     </p>
                   </div>
                   <span className="text-base font-semibold text-brand-300">{entry.total_points}</span>
-                </div>
+                </Link>
               );
             })}
           </div>

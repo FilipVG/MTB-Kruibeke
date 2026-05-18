@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { formatRideDate, toDatetimeLocal, fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
@@ -320,7 +321,7 @@ export default function RitBeheerPage() {
           <div className="divide-y divide-ink-800 mb-4">
             {registrations.map(reg => (
               <div key={reg.id} className="flex items-center justify-between py-3 gap-3">
-                <span className="text-sm text-ink-200 min-w-0 truncate">{displayName(reg.profile)}</span>
+                <Link href={`/leden/${reg.user_id}`} className="text-sm text-ink-200 hover:text-white min-w-0 truncate transition">{displayName(reg.profile)}</Link>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => toggleAttendance(reg.id, reg.attended)}

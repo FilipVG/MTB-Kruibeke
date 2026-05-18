@@ -149,7 +149,9 @@ export function RideReviews({ rideId, initialReviews, currentUserId }: Props) {
               <ReviewAvatar profile={r.profile} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-medium text-ink-200">{getDisplayName(r.profile)}</span>
+                  <a href={`/leden/${r.profile.id}`} className="text-sm font-medium text-ink-200 hover:text-white transition">
+                    {getDisplayName(r.profile)}
+                  </a>
                   <Stars score={r.score} />
                 </div>
                 {r.comment && <p className="text-sm text-ink-400 leading-relaxed">{r.comment}</p>}
