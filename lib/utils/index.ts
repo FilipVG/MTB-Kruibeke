@@ -43,6 +43,27 @@ export function isRegistrationOpen(ride: { start_at: string; registration_open: 
   return ride.registration_open && !ride.cancelled && !isPast(new Date(ride.start_at));
 }
 
+export function rideTypeBadge(type: string): string {
+  if (type === 'mtb') return 'badge-mtb';
+  if (type === 'gravel') return 'badge-gravel';
+  if (type === 'jokerrit') return 'badge-jokerrit';
+  return 'badge-baanrit';
+}
+
+export function rideTypeLabel(type: string): string {
+  if (type === 'mtb') return 'MTB';
+  if (type === 'gravel') return 'Gravel';
+  if (type === 'jokerrit') return 'Jokerrit';
+  return 'Training';
+}
+
+export function rideTypeEmoji(type: string): string {
+  if (type === 'mtb') return '🚵';
+  if (type === 'gravel') return '🚴';
+  if (type === 'jokerrit') return '🃏';
+  return '🏁';
+}
+
 export function computeReminderAt(startAtUtc: string, daysBefore: number): string {
   const d = new Date(startAtUtc);
   d.setUTCDate(d.getUTCDate() - daysBefore);

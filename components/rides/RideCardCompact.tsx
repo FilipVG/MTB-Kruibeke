@@ -4,7 +4,7 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, MapPin, Trophy, Users, Check, Star } from 'lucide-react';
-import { formatRideDate, cn } from '@/lib/utils';
+import { formatRideDate, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types/database';
 
@@ -12,7 +12,7 @@ interface Props {
   ride: {
     id: string;
     title: string;
-    ride_type: 'mtb' | 'gravel' | 'baanrit';
+    ride_type: string;
     start_at: string;
     start_location: string;
     in_ranking: boolean;
@@ -70,8 +70,8 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       {/* Badges + teller */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : ride.ride_type === 'gravel' ? 'badge-gravel' : 'badge-baanrit'}>
-            {ride.ride_type === 'mtb' ? 'MTB' : ride.ride_type === 'gravel' ? 'Gravel' : 'Training'}
+          <span className={rideTypeBadge(ride.ride_type)}>
+            {rideTypeLabel(ride.ride_type)}
           </span>
           {ride.in_ranking && ride.points > 0 && (
             isTopRit ? (

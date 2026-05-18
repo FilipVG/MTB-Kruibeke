@@ -25,7 +25,7 @@ interface Ride {
   id: string;
   title: string;
   description: string | null;
-  ride_type: 'mtb' | 'gravel' | 'baanrit';
+  ride_type: 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
   start_at: string;
   start_location: string;
   distance_km: number | null;
@@ -194,10 +194,11 @@ export default function RitBeheerPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-ink-200 mb-1.5">Type</label>
-              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' | 'baanrit' })}>
+              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit' })}>
                 <option value="mtb">MTB</option>
                 <option value="gravel">Gravel</option>
                 <option value="baanrit">Training op de baan</option>
+                <option value="jokerrit">Jokerrit</option>
               </select>
             </div>
             <div>

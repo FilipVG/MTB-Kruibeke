@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Trophy, Download, Users, Check, X, Star } from 'lucide-react';
-import { formatRideDate, isRegistrationOpen, getDisplayName, cn } from '@/lib/utils';
+import { formatRideDate, isRegistrationOpen, getDisplayName, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types/database';
 
@@ -13,7 +13,7 @@ interface Props {
     id: string;
     title: string;
     description: string | null;
-    ride_type: 'mtb' | 'gravel' | 'baanrit';
+    ride_type: string;
     start_at: string;
     start_location: string;
     distance_km: number | null;
@@ -78,8 +78,8 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-2">
-              <span className={ride.ride_type === 'mtb' ? 'badge-mtb' : ride.ride_type === 'gravel' ? 'badge-gravel' : 'badge-baanrit'}>
-                {ride.ride_type === 'mtb' ? 'MTB' : ride.ride_type === 'gravel' ? 'Gravel' : 'Training'}
+              <span className={rideTypeBadge(ride.ride_type)}>
+                {rideTypeLabel(ride.ride_type)}
               </span>
               {ride.in_ranking && ride.points > 0 && (
                 isTopRit ? (

@@ -13,7 +13,7 @@ export default function NieuweRitPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit',
+    ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit',
     start_at: '',
     start_location: '',
     distance_km: '',
@@ -85,14 +85,15 @@ export default function NieuweRitPage() {
               className="input"
               value={form.ride_type}
               onChange={e => {
-                const type = e.target.value as 'mtb' | 'gravel' | 'baanrit';
-                const isRanking = type === 'mtb';
+                const type = e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
+                const isRanking = type === 'mtb' || type === 'jokerrit';
                 setForm({ ...form, ride_type: type, in_ranking: isRanking, points: isRanking ? 2 : 0 });
               }}
             >
               <option value="mtb">MTB</option>
               <option value="gravel">Gravel</option>
               <option value="baanrit">Training op de baan</option>
+              <option value="jokerrit">Jokerrit</option>
             </select>
           </div>
           <div>

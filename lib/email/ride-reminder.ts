@@ -37,12 +37,14 @@ function formatTime(iso: string): string {
 function rideTypeLabel(type: string): string {
   if (type === 'mtb') return 'MTB';
   if (type === 'gravel') return 'Gravel';
+  if (type === 'jokerrit') return 'Jokerrit';
   return 'Training op de baan';
 }
 
 function rideTypeEmoji(type: string): string {
   if (type === 'mtb') return '🚵';
   if (type === 'gravel') return '🚴';
+  if (type === 'jokerrit') return '🃏';
   return '🏁';
 }
 
