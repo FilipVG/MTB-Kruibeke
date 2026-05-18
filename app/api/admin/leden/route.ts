@@ -1,19 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-async function verifyAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  return profile?.role === 'admin' ? supabase : null;
-}
-
 export async function POST(req: NextRequest) {
-  if (!await verifyAdmin()) {
-    return NextResponse.json({ error: 'Geen toegang' }, { status: 403 });
-  }
+  const authResult = await requireAdmin();
+  if (authResult instanceof NextResponse) return authResult;
 
   const { email, first_name, last_name, phone, birthdate, role } = await req.json();
   const normalizedEmail = email.toLowerCase().trim();

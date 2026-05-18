@@ -90,8 +90,12 @@ export interface RankingEntry {
 }
 
 // Joined types
+export type RegistrationWithProfile = RideRegistration & {
+  profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'>;
+};
+
 export interface RideWithRegistrations extends Ride {
-  registrations: (RideRegistration & { profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> })[];
+  registrations: RegistrationWithProfile[];
   registration_count?: number;
   is_registered?: boolean;
 }

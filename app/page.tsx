@@ -2,13 +2,11 @@ import Link from 'next/link';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideCardCompact } from '@/components/rides/RideCardCompact';
-import type { Ride, Profile, Sponsor } from '@/lib/types/database';
+import type { Ride, Sponsor, RegistrationWithProfile } from '@/lib/types/database';
 
 export default async function HomePage() {
   const supabase = await createClient();
   const current = await getCurrentUser();
-
-  type Registration = { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> };
 
   const { data: upcomingRides } = await supabase
     .from('rides')
@@ -18,7 +16,7 @@ export default async function HomePage() {
     .order('start_at', { ascending: true })
     .limit(3);
 
-  const ridesWithMeta = (upcomingRides ?? []).map((r: Ride & { registrations: Registration[] }) => ({
+  const ridesWithMeta = (upcomingRides ?? []).map((r: Ride & { registrations: RegistrationWithProfile[] }) => ({
     ...r,
     registration_count: r.registrations?.length ?? 0,
     is_registered: current?.user ? r.registrations?.some(reg => reg.user_id === current.user.id) : false,

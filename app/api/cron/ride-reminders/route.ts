@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { buildRideReminderEmail } from '@/lib/email/ride-reminder';
+import { sendRideEmails } from '@/lib/email/send-ride-emails';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,47 +40,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ sent: 0, message: 'Geen leden met herinneringen ingeschakeld.' });
   }
 
-  // Top 3 klassement huidig jaar
-  const huidigJaar = new Date().getFullYear();
-  const { data: ranking } = await supabase
-    .rpc('get_ranking', { p_year: huidigJaar });
-
-  const top3 = (ranking ?? []).slice(0, 3).map((e: any, i: number) => ({
-    place: i + 1,
-    name: e.nickname || (`${e.first_name ?? ''} ${e.last_name ?? ''}`.trim() || 'Onbekend'),
-    total_points: e.total_points,
-  }));
-
   let totalSent = 0;
 
   for (const ride of rides) {
-    // Haal inschrijvingen op voor deze rit (inclusief naam)
-    const { data: registrations } = await supabase
-      .from('ride_registrations')
-      .select('user_id, profile:profiles(first_name, last_name, nickname)')
-      .eq('ride_id', ride.id);
+    totalSent += await sendRideEmails(supabase, ride, members, resend, siteUrl, from);
 
-    const registeredIds = new Set((registrations ?? []).map((r: any) => r.user_id));
-    const registeredNames = (registrations ?? []).map((r: any) => {
-      const p = r.profile as any;
-      return p?.nickname || (`${p?.first_name ?? ''} ${p?.last_name ?? ''}`.trim() || 'Onbekend');
-    });
-
-    // Bouw per lid een gepersonaliseerde mail
-    const emails = members.map((m: any) => {
-      const isRegistered = registeredIds.has(m.id);
-      const { subject, html } = buildRideReminderEmail(ride, top3, siteUrl, isRegistered, registeredNames);
-      return { from, to: m.email, subject, html };
-    });
-
-    // Verwerk in batches van 50 (Resend limiet)
-    for (let i = 0; i < emails.length; i += 50) {
-      const batch = emails.slice(i, i + 50);
-      await resend.batch.send(batch);
-      totalSent += batch.length;
-    }
-
-    // Markeer als verstuurd
     await supabase
       .from('rides')
       .update({ reminder_sent_at: new Date().toISOString() })

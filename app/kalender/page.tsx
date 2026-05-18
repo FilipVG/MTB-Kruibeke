@@ -4,7 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideListItem } from '@/components/rides/RideListItem';
 import { ActivityListItem } from '@/components/activities/ActivityListItem';
 import { AbonneerKnop } from '@/components/kalender/AbonneerKnop';
-import type { Ride, Activity, Profile } from '@/lib/types/database';
+import type { Ride, Activity, RegistrationWithProfile } from '@/lib/types/database';
 
 export const metadata = { title: 'Kalender — MTB Kruibeke' };
 
@@ -33,7 +33,6 @@ export default async function KalenderPage({ searchParams }: Props) {
   const volgendeLink = `?maand=${volgendeDate.getMonth() + 1}&jaar=${volgendeDate.getFullYear()}`;
 
   // Ritten (publiek)
-  type Registration = { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> };
   const { data: rides } = await supabase
     .from('rides')
     .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
@@ -41,7 +40,7 @@ export default async function KalenderPage({ searchParams }: Props) {
     .lt('start_at', totDatum)
     .order('start_at', { ascending: true });
 
-  const ridesWithMeta = (rides ?? []).map((r: Ride & { registrations: Registration[] }) => ({
+  const ridesWithMeta = (rides ?? []).map((r: Ride & { registrations: RegistrationWithProfile[] }) => ({
     ...r,
     registration_count: r.registrations?.length ?? 0,
     is_registered: current?.user ? r.registrations?.some(reg => reg.user_id === current.user.id) : false,
