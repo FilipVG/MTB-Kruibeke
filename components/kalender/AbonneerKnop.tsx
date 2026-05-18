@@ -7,6 +7,8 @@ export function AbonneerKnop({ url }: { url: string }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const webcalUrl = url.replace(/^https?:\/\//, 'webcal://');
+
   async function copy() {
     await navigator.clipboard.writeText(url);
     setCopied(true);
@@ -22,10 +24,8 @@ export function AbonneerKnop({ url }: { url: string }) {
 
       {open && (
         <>
-          {/* Overlay om te sluiten */}
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
 
-          {/* Popup */}
           <div className="absolute right-0 top-full mt-2 z-20 w-80 card p-4 shadow-xl">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-medium text-white">Kalenderlink</p>
@@ -33,27 +33,41 @@ export function AbonneerKnop({ url }: { url: string }) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="text-xs text-ink-400 mb-3">
-              Voeg deze URL toe als abonnement in Google Calendar, Outlook of Apple Agenda. De kalender blijft automatisch gesynchroniseerd.
-            </p>
-            <div className="flex items-center gap-2">
-              <input
-                readOnly
-                value={url}
-                className="input text-xs flex-1 truncate"
-                onFocus={e => e.target.select()}
-              />
-              <button
-                onClick={copy}
-                className="btn-secondary shrink-0 px-3"
-                title="Kopieer link"
+
+            {/* iPhone / Apple Agenda */}
+            <div className="mb-4">
+              <p className="text-xs font-medium text-ink-300 mb-1.5">iPhone / Apple Agenda</p>
+              <a
+                href={webcalUrl}
+                className="btn-secondary w-full justify-center text-xs"
+                onClick={() => setOpen(false)}
               >
-                {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
-              </button>
+                <CalendarDays className="h-3.5 w-3.5" />
+                Voeg toe aan Apple Agenda
+              </a>
             </div>
-            {copied && (
-              <p className="text-xs text-green-400 mt-2">Gekopieerd!</p>
-            )}
+
+            {/* Google / Outlook */}
+            <div>
+              <p className="text-xs font-medium text-ink-300 mb-1.5">Google Calendar / Outlook</p>
+              <p className="text-xs text-ink-400 mb-2">Kopieer deze URL en plak ze in je agenda-app.</p>
+              <div className="flex items-center gap-2">
+                <input
+                  readOnly
+                  value={url}
+                  className="input text-xs flex-1 truncate"
+                  onFocus={e => e.target.select()}
+                />
+                <button
+                  onClick={copy}
+                  className="btn-secondary shrink-0 px-3"
+                  title="Kopieer link"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                </button>
+              </div>
+              {copied && <p className="text-xs text-green-400 mt-2">Gekopieerd!</p>}
+            </div>
           </div>
         </>
       )}

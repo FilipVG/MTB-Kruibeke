@@ -11,6 +11,31 @@ function escapeText(text: string): string {
   return text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 }
 
+// RFC 5545: regels langer dan 75 bytes afbreken met CRLF + spatie
+function foldLine(line: string): string {
+  const chars = [...line]; // Unicode-safe splitsing
+  const result: string[] = [];
+  let current = '';
+  let bytes = 0;
+  let first = true;
+
+  for (const char of chars) {
+    const charBytes = Buffer.byteLength(char, 'utf8');
+    const limit = first ? 75 : 74; // vervolgregel begint met 1 spatie
+    if (bytes + charBytes > limit) {
+      result.push(current);
+      current = ' ' + char;
+      bytes = 1 + charBytes;
+      first = false;
+    } else {
+      current += char;
+      bytes += charBytes;
+    }
+  }
+  if (current) result.push(current);
+  return result.join('\r\n');
+}
+
 /**
  * Endpoint: /api/calendar.ics
  * Levert alle ritten + activiteiten als iCalendar feed.
@@ -87,8 +112,7 @@ export async function GET() {
 
   lines.push('END:VCALENDAR');
 
-  // Vouw lange regels (RFC 5545 vereist max 75 chars)
-  const body = lines.filter(Boolean).join('\r\n');
+  const body = lines.filter(Boolean).map(foldLine).join('\r\n');
 
   return new NextResponse(body, {
     headers: {
