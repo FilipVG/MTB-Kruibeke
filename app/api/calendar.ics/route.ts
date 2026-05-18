@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 3600; // CDN cachet 1 uur
+export const dynamic = 'force-dynamic';
 
 function formatICalDate(date: Date): string {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
