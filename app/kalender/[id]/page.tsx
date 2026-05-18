@@ -19,7 +19,7 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
 
   const { data: ride } = await supabase
     .from('rides')
-    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
+    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url)), creator:profiles!rides_created_by_fkey(id, nickname, first_name, last_name)`)
     .eq('id', id)
     .single();
 
@@ -30,6 +30,8 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
     ? registrations.some(r => r.user_id === current.user.id)
     : false;
   const isTopRit = ride.in_ranking && ride.points === 5;
+  const attendedCount = registrations.filter((r: any) => r.attended === true).length;
+  const jokerritKwalificeert = ride.ride_type === 'jokerrit' && attendedCount >= 4;
 
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 py-12">
@@ -50,7 +52,18 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
           <span className={rideTypeBadge(ride.ride_type)}>
             {rideTypeLabel(ride.ride_type)}
           </span>
-          {ride.in_ranking && ride.points > 0 && (
+          {ride.ride_type === 'jokerrit' && (
+            <span className={cn(
+              'badge border',
+              jokerritKwalificeert
+                ? 'bg-purple-800/40 text-purple-200 border-purple-600/50'
+                : 'bg-ink-800 text-ink-400 border-ink-700'
+            )}>
+              <Trophy className="h-3 w-3 mr-1" />
+              {jokerritKwalificeert ? '2 punten · telt mee' : `2 punten · ${attendedCount}/4 aanwezig`}
+            </span>
+          )}
+          {ride.in_ranking && ride.points > 0 && ride.ride_type !== 'jokerrit' && (
             isTopRit ? (
               <span className="badge bg-amber-800/50 text-amber-300 border border-amber-600/50">
                 <Star className="h-3 w-3 mr-1 fill-amber-400 text-amber-400" />
@@ -63,15 +76,24 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
               </span>
             )
           )}
+          )}
           {ride.cancelled && (
             <span className="badge bg-red-900/40 text-red-200 border border-red-800">Afgelast</span>
           )}
         </div>
 
         {/* Titel */}
-        <h1 className={cn('text-2xl sm:text-3xl font-semibold mb-5', isTopRit ? 'text-amber-50' : 'text-white')}>
+        <h1 className={cn('text-2xl sm:text-3xl font-semibold mb-2', isTopRit ? 'text-amber-50' : 'text-white')}>
           {ride.title}
         </h1>
+        {ride.ride_type === 'jokerrit' && ride.creator && (
+          <p className="text-sm text-purple-300 mb-4">
+            🃏 Georganiseerd door{' '}
+            <span className="font-medium">
+              {getDisplayName(ride.creator as Pick<Profile, 'nickname' | 'first_name' | 'last_name'>)}
+            </span>
+          </p>
+        )}
 
         {/* Info */}
         <div className="space-y-2 text-sm text-ink-400 mb-6">
