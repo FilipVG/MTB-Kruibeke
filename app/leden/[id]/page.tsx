@@ -116,7 +116,7 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
             <Clock className="h-4 w-4 text-ink-500 shrink-0" />
             <span>Laatste bezoek: {formatLastSeen(member.last_seen_at)}</span>
           </div>
-          {member.vwb_card_url && (current?.user.id === id || current?.profile?.role === 'admin') && (
+          {member.vwb_card_url && current && (
             <Link
               href={`/leden/${id}/lidkaart`}
               className="flex items-center gap-3 text-sm text-ink-300 hover:text-white transition"

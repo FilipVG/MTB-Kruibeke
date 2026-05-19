@@ -8,10 +8,6 @@ export default async function LidkaartPage({ params }: { params: Promise<{ id: s
   const current = await getCurrentUser();
   if (!current) redirect(`/auth/login?redirect=/leden/${id}/lidkaart`);
 
-  const isOwnProfile = current.user.id === id;
-  const isAdmin = current.profile?.role === 'admin';
-  if (!isOwnProfile && !isAdmin) redirect(`/leden/${id}`);
-
   const supabase = await createClient();
   const { data: member } = await supabase
     .from('profiles')
