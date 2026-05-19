@@ -25,17 +25,23 @@ export default async function LedenPage() {
           <Link key={member.id} href={`/leden/${member.id}`} className="card p-5 block hover:border-brand-700/50 hover:bg-ink-900/60 transition">
             {/* Avatar + naam */}
             <div className="flex items-start gap-4 mb-4">
-              {member.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={member.avatar_url} alt="" className="h-14 w-14 rounded-full object-cover shrink-0" />
-              ) : (
-                <div className={cn(
-                  'h-14 w-14 rounded-full flex items-center justify-center font-medium text-white shrink-0',
-                  'bg-brand-700'
-                )}>
-                  {getInitials(member)}
-                </div>
-              )}
+              <div className="relative shrink-0 hover:z-50">
+                {member.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={member.avatar_url}
+                    alt=""
+                    className="h-14 w-14 rounded-full object-cover cursor-zoom-in origin-top-left transition-[transform,border-radius,box-shadow] duration-200 hover:scale-[2.5] hover:rounded-xl hover:shadow-2xl"
+                  />
+                ) : (
+                  <div className={cn(
+                    'h-14 w-14 rounded-full flex items-center justify-center font-medium text-white cursor-zoom-in origin-top-left transition-[transform,border-radius] duration-200 hover:scale-[2.5] hover:rounded-xl hover:shadow-2xl',
+                    'bg-brand-700'
+                  )}>
+                    {getInitials(member)}
+                  </div>
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="font-medium text-white truncate">{getDisplayName(member)}</p>
