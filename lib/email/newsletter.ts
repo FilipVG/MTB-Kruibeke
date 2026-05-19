@@ -170,14 +170,22 @@ export function buildNewsletterEmail(
 
         <!-- Header -->
         <tr>
-          <td style="background:#111827;padding:28px 32px;">
-            <img src="${siteUrl}/logo.png" alt="MTB Kruibeke" height="56"
-                 style="display:block;height:56px;width:auto;margin-bottom:16px;" />
-            <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.2em;text-transform:uppercase;">Mountainbike club · Waasland</p>
-            <h1 style="margin:6px 0 0;font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-0.02em;">Off-Road Update</h1>
-            <p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.55);">
-              MTB Kruibeke &mdash; agenda komende 12 maanden
-            </p>
+          <td style="background:#0a0a0a;padding:28px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.2em;text-transform:uppercase;">Mountainbike club · Waasland</p>
+                  <h1 style="margin:6px 0 0;font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-0.02em;">Off-Road Update</h1>
+                  <p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.55);">
+                    MTB Kruibeke &mdash; agenda komende 12 maanden
+                  </p>
+                </td>
+                <td style="vertical-align:middle;text-align:right;width:80px;padding-left:16px;">
+                  <img src="${siteUrl}/logo.png" alt="MTB Kruibeke" height="64"
+                       style="display:block;height:64px;width:auto;margin-left:auto;" />
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 
