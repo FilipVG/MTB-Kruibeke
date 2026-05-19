@@ -1,15 +1,17 @@
 import Link from 'next/link';
-import { Calendar, Users, Star, Activity } from 'lucide-react';
+import { Calendar, Users, Star, Activity, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { getNewsletterData } from '@/lib/newsletter';
 
 export const metadata = { title: 'Admin — MTB Kruibeke' };
 
 export default async function AdminPage() {
   const supabase = await createClient();
-  const [{ count: ridesCount }, { count: membersCount }, { count: sponsorsCount }] = await Promise.all([
+  const [{ count: ridesCount }, { count: membersCount }, { count: sponsorsCount }, newsletter] = await Promise.all([
     supabase.from('rides').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('sponsors').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    getNewsletterData(supabase),
   ]);
 
   const sections = [
@@ -44,6 +46,16 @@ export default async function AdminPage() {
       icon: Activity,
       stat: null,
       statLabel: '',
+    },
+    {
+      href: '/admin/nieuwsbrief',
+      title: 'Off-Road Update',
+      desc: newsletter.changedCount > 0
+        ? `${newsletter.changedCount} nieuwe/gewijzigde item${newsletter.changedCount !== 1 ? 's' : ''} klaar om te versturen.`
+        : 'Geen nieuwe items — nieuwsbrief is up-to-date.',
+      icon: Mail,
+      stat: newsletter.changedCount > 0 ? newsletter.changedCount : null,
+      statLabel: 'nieuw',
     },
   ];
 
