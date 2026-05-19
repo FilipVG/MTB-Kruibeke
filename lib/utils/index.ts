@@ -1,22 +1,44 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { format, formatDistance, isPast, isToday, isTomorrow } from 'date-fns';
-import { nl } from 'date-fns/locale';
+import { isPast } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const TZ = 'Europe/Brussels';
+
+function brusselsDayStr(d: Date): string {
+  return new Intl.DateTimeFormat('sv', {
+    timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(d);
+}
+
 export function formatRideDate(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  if (isToday(d)) return `Vandaag · ${format(d, 'HH:mm')}`;
-  if (isTomorrow(d)) return `Morgen · ${format(d, 'HH:mm')}`;
-  return format(d, "EEEE d MMMM · HH:mm", { locale: nl });
+  const now = new Date();
+  const dayStr = brusselsDayStr(d);
+  const todayStr = brusselsDayStr(now);
+  const tomorrowStr = brusselsDayStr(new Date(now.getTime() + 86_400_000));
+
+  const time = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, hour: '2-digit', minute: '2-digit',
+  }).format(d);
+
+  if (dayStr === todayStr) return `Vandaag · ${time}`;
+  if (dayStr === tomorrowStr) return `Morgen · ${time}`;
+
+  const label = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long',
+  }).format(d);
+  return `${label} · ${time}`;
 }
 
 export function formatShortDate(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return format(d, 'EEE d MMM', { locale: nl });
+  return new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short',
+  }).format(d);
 }
 
 export function getInitials(profile: {

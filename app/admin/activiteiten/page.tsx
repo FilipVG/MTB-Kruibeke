@@ -7,6 +7,7 @@ export const metadata = { title: 'Activiteiten beheren — Admin' };
 
 function formatDate(str: string) {
   return new Date(str).toLocaleDateString('nl-BE', {
+    timeZone: 'Europe/Brussels',
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }

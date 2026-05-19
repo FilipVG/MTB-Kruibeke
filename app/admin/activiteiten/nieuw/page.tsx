@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { defaultStartAt } from '@/lib/utils';
+import { defaultStartAt, fromDatetimeLocal } from '@/lib/utils';
 
 export default function NieuweActiviteitPage() {
   const router = useRouter();
@@ -28,8 +28,8 @@ export default function NieuweActiviteitPage() {
     const { error } = await supabase.from('activities').insert({
       title: form.title,
       description: form.description || null,
-      start_at: new Date(form.start_at).toISOString(),
-      end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
+      start_at: fromDatetimeLocal(form.start_at),
+      end_at: form.end_at ? fromDatetimeLocal(form.end_at) : null,
       location: form.location || null,
       registration_required: form.registration_required,
       max_participants: form.max_participants ? Number(form.max_participants) : null,

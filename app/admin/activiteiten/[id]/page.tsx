@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { toDatetimeLocal, fromDatetimeLocal } from '@/lib/utils';
 import { AlertTriangle, Check, X } from 'lucide-react';
 import type { Activity } from '@/lib/types/database';
 
@@ -32,8 +33,8 @@ export default function ActiviteitBeheerPage() {
         setForm({
           title: data.title,
           description: data.description ?? '',
-          start_at: data.start_at.slice(0, 16),
-          end_at: data.end_at ? data.end_at.slice(0, 16) : '',
+          start_at: toDatetimeLocal(data.start_at),
+          end_at: data.end_at ? toDatetimeLocal(data.end_at) : '',
           location: data.location ?? '',
           registration_required: data.registration_required,
           max_participants: data.max_participants,
@@ -59,8 +60,8 @@ export default function ActiviteitBeheerPage() {
     const { error } = await supabase.from('activities').update({
       title: form.title,
       description: form.description || null,
-      start_at: new Date(form.start_at).toISOString(),
-      end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
+      start_at: fromDatetimeLocal(form.start_at),
+      end_at: form.end_at ? fromDatetimeLocal(form.end_at) : null,
       location: form.location || null,
       registration_required: form.registration_required,
       max_participants: form.max_participants || null,

@@ -18,6 +18,7 @@ interface Props {
 
 function formatDate(str: string) {
   return new Date(str).toLocaleDateString('nl-BE', {
+    timeZone: 'Europe/Brussels',
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
