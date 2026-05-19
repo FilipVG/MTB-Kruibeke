@@ -65,6 +65,7 @@ export interface Activity {
   cancelled: boolean;
   created_by: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Sponsor {

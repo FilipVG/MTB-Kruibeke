@@ -20,7 +20,7 @@ export default function ActiviteitBeheerPage() {
   const supabase = createClient();
 
   const [activity, setActivity] = useState<Activity | null>(null);
-  const [form, setForm] = useState<Omit<Activity, 'id' | 'created_at' | 'created_by'> | null>(null);
+  const [form, setForm] = useState<Omit<Activity, 'id' | 'created_at' | 'created_by' | 'updated_at'> | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
