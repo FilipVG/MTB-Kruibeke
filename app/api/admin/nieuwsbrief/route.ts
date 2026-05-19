@@ -51,12 +51,15 @@ export async function POST(request: Request) {
     totalSent += batch.length;
   }
 
-  await admin.from('newsletter_runs').insert({
-    sent_by: user?.id ?? null,
-    recipient_count: totalSent,
-    test_mode,
-    new_item_count: data.changedCount,
-  });
+  // Enkel loggen bij echte verzending — testmodus verschuift de referentiedatum niet
+  if (!test_mode) {
+    await admin.from('newsletter_runs').insert({
+      sent_by: user?.id ?? null,
+      recipient_count: totalSent,
+      test_mode: false,
+      new_item_count: data.changedCount,
+    });
+  }
 
   return NextResponse.json({ sent: totalSent, test_mode, items: data.changedCount });
 }
