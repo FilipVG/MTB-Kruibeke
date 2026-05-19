@@ -13,6 +13,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   const body = await request.json().catch(() => ({}));
   const test_mode: boolean = body.test_mode !== false;
+  const intro_text: string = body.intro_text ?? '';
 
   const data = await getNewsletterData(supabase);
 
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtbkruibeke.be';
-  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl);
+  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl, intro_text);
 
   const admin = createAdminClient();
 
@@ -59,6 +60,8 @@ export async function POST(request: Request) {
       test_mode: false,
       new_item_count: data.changedCount,
     });
+    // Introtekst wissen na verzending naar leden
+    await admin.from('newsletter_settings').upsert({ id: 1, intro_text: '', updated_at: new Date().toISOString() });
   }
 
   return NextResponse.json({ sent: totalSent, test_mode, items: data.changedCount });

@@ -94,6 +94,7 @@ export function buildNewsletterEmail(
   rides: NewsletterRide[],
   activities: NewsletterActivity[],
   siteUrl: string,
+  introText = '',
 ): { subject: string; html: string } {
   const changedItems = [...rides, ...activities]
     .filter(i => i.status !== 'existing')
@@ -189,6 +190,14 @@ export function buildNewsletterEmail(
           </td>
         </tr>
 
+        ${introText.trim() ? `
+        <tr>
+          <td style="padding:24px 32px 0;">
+            <p style="margin:0;font-size:15px;color:#374151;line-height:1.75;">${introText.trim().replace(/\n/g, '<br>')}</p>
+          </td>
+        </tr>
+        <tr><td style="padding:0 32px;"><div style="height:1px;background:#e5e7eb;margin:20px 0 0;"></div></td></tr>
+        ` : ''}
         ${changedSection}
         ${activitiesSection}
         ${ridesSection}

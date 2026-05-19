@@ -80,14 +80,20 @@ function ActivityRow({ activity }: { activity: NewsletterActivity }) {
 
 export default async function AdminNieuwsbriefPage() {
   const supabase = await createClient();
-  const [data, { data: runs }] = await Promise.all([
+  const [data, { data: runs }, { data: settings }] = await Promise.all([
     getNewsletterData(supabase),
     supabase
       .from('newsletter_runs')
       .select('id, sent_at, recipient_count, test_mode, new_item_count')
       .order('sent_at', { ascending: false })
       .limit(10),
+    supabase
+      .from('newsletter_settings')
+      .select('intro_text')
+      .eq('id', 1)
+      .maybeSingle(),
   ]);
+  const introText: string = (settings as any)?.intro_text ?? '';
 
   const changedRides = data.rides.filter(r => r.status !== 'existing');
   const changedActivities = data.activities.filter(a => a.status !== 'existing');
@@ -109,16 +115,16 @@ export default async function AdminNieuwsbriefPage() {
 
       {/* Komende nieuwsbrief — preview */}
       <section className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-ink-800 flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="font-semibold text-white">Komende nieuwsbrief</h2>
-            <p className="text-xs text-ink-400 mt-0.5">
-              {totalChanged > 0
-                ? `${totalChanged} nieuwe/gewijzigde item${totalChanged !== 1 ? 's' : ''} · ${data.rides.length} ritt${data.rides.length !== 1 ? 'en' : ''} · ${data.activities.length} activiteit${data.activities.length !== 1 ? 'en' : ''} in de komende 12 maanden`
-                : 'Geen nieuwe of gewijzigde items'}
-            </p>
-          </div>
-          <VerstuurKnop canSend={totalChanged > 0} />
+        <div className="px-5 py-4 border-b border-ink-800">
+          <h2 className="font-semibold text-white">Komende nieuwsbrief</h2>
+          <p className="text-xs text-ink-400 mt-0.5">
+            {totalChanged > 0
+              ? `${totalChanged} nieuwe/gewijzigde item${totalChanged !== 1 ? 's' : ''} · ${data.rides.length} ritt${data.rides.length !== 1 ? 'en' : ''} · ${data.activities.length} activiteit${data.activities.length !== 1 ? 'en' : ''} in de komende periode`
+              : 'Geen nieuwe of gewijzigde items'}
+          </p>
+        </div>
+        <div className="px-5 py-4 border-b border-ink-800">
+          <VerstuurKnop canSend={totalChanged > 0} initialIntroText={introText} />
         </div>
 
         {/* Nieuwe / gewijzigde items — samenvatting */}
