@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Calendar, MapPin, Users, Check, PartyPopper } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -83,7 +84,9 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
                 <span className="badge bg-ink-800 text-ink-400 border border-ink-700">Volzet</span>
               )}
             </div>
-            <h3 className="text-lg font-medium text-white">{activity.title}</h3>
+            <Link href={`/kalender/activiteiten/${activity.id}`} className="text-lg font-medium text-white hover:text-amber-200 transition">
+              {activity.title}
+            </Link>
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-400">
               <span className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />
