@@ -139,16 +139,6 @@ export default async function AdminNieuwsbriefPage() {
           </div>
         )}
 
-        {/* Ritten */}
-        {data.rides.length > 0 && (
-          <div>
-            <p className="px-4 py-2.5 text-xs font-medium text-ink-500 uppercase tracking-wide border-b border-ink-800 bg-ink-900/30">
-              🚵 Ritten ({data.rides.length})
-            </p>
-            {data.rides.map(r => <RideRow key={r.id} ride={r} />)}
-          </div>
-        )}
-
         {/* Activiteiten */}
         {data.activities.length > 0 && (
           <div>
@@ -156,6 +146,16 @@ export default async function AdminNieuwsbriefPage() {
               🎉 Activiteiten ({data.activities.length})
             </p>
             {data.activities.map(a => <ActivityRow key={a.id} activity={a} />)}
+          </div>
+        )}
+
+        {/* Ritten */}
+        {data.rides.length > 0 && (
+          <div>
+            <p className="px-4 py-2.5 text-xs font-medium text-ink-500 uppercase tracking-wide border-b border-ink-800 bg-ink-900/30">
+              🚵 Ritten ({data.rides.length})
+            </p>
+            {data.rides.map(r => <RideRow key={r.id} ride={r} />)}
           </div>
         )}
 

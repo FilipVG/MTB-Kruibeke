@@ -180,8 +180,8 @@ export function buildNewsletterEmail(
         </tr>
 
         ${changedSection}
-        ${ridesSection}
         ${activitiesSection}
+        ${ridesSection}
         ${emptySection}
 
         <!-- Login notice -->
