@@ -43,9 +43,12 @@ export interface NewsletterData {
 
 export async function getNewsletterData(supabase: SupabaseClient): Promise<NewsletterData> {
   const now = new Date().toISOString();
+  const in3Months = new Date();
+  in3Months.setMonth(in3Months.getMonth() + 3);
+  const ridesMaxDate = in3Months.toISOString();
   const in12Months = new Date();
   in12Months.setFullYear(in12Months.getFullYear() + 1);
-  const maxDate = in12Months.toISOString();
+  const activitiesMaxDate = in12Months.toISOString();
 
   const { data: lastRunData } = await supabase
     .from('newsletter_runs')
@@ -70,13 +73,13 @@ export async function getNewsletterData(supabase: SupabaseClient): Promise<Newsl
       .from('rides')
       .select('id, title, start_at, ride_type, start_location, distance_km, in_ranking, points, cancelled, created_at, updated_at')
       .gte('start_at', now)
-      .lte('start_at', maxDate)
+      .lte('start_at', ridesMaxDate)
       .order('start_at', { ascending: true }),
     supabase
       .from('activities')
       .select('id, title, start_at, end_at, location, registration_required, cancelled, created_at, updated_at')
       .gte('start_at', now)
-      .lte('start_at', maxDate)
+      .lte('start_at', activitiesMaxDate)
       .order('start_at', { ascending: true }),
   ]);
 

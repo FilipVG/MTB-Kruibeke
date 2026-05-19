@@ -128,7 +128,7 @@ export function buildNewsletterEmail(
   const ridesSection = rides.length > 0 ? `
         <tr>
           <td style="padding:24px 32px 0;">
-            <h2 style="margin:0 0 12px;font-size:16px;font-weight:700;color:#111827;">🚵 Ritten <span style="font-size:13px;font-weight:400;color:#9ca3af;">(${rides.length})</span></h2>
+            <h2 style="margin:0 0 12px;font-size:16px;font-weight:700;color:#111827;">🚵 Ritten <span style="font-size:13px;font-weight:400;color:#9ca3af;">komende 3 maanden (${rides.length})</span></h2>
             <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
               ${rides.map(r => rideRow(r, siteUrl)).join('')}
             </table>
@@ -139,7 +139,7 @@ export function buildNewsletterEmail(
   const activitiesSection = activities.length > 0 ? `
         <tr>
           <td style="padding:24px 32px 0;">
-            <h2 style="margin:0 0 12px;font-size:16px;font-weight:700;color:#111827;">🎉 Activiteiten <span style="font-size:13px;font-weight:400;color:#9ca3af;">(${activities.length})</span></h2>
+            <h2 style="margin:0 0 12px;font-size:16px;font-weight:700;color:#111827;">🎉 Activiteiten <span style="font-size:13px;font-weight:400;color:#9ca3af;">komende 12 maanden (${activities.length})</span></h2>
             <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
               ${activities.map(a => activityRow(a, siteUrl)).join('')}
             </table>

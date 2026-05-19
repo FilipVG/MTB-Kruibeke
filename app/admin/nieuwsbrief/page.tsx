@@ -143,7 +143,7 @@ export default async function AdminNieuwsbriefPage() {
         {data.activities.length > 0 && (
           <div>
             <p className="px-4 py-2.5 text-xs font-medium text-ink-500 uppercase tracking-wide border-b border-ink-800 bg-ink-900/30">
-              🎉 Activiteiten ({data.activities.length})
+              🎉 Activiteiten — komende 12 maanden ({data.activities.length})
             </p>
             {data.activities.map(a => <ActivityRow key={a.id} activity={a} />)}
           </div>
@@ -153,7 +153,7 @@ export default async function AdminNieuwsbriefPage() {
         {data.rides.length > 0 && (
           <div>
             <p className="px-4 py-2.5 text-xs font-medium text-ink-500 uppercase tracking-wide border-b border-ink-800 bg-ink-900/30">
-              🚵 Ritten ({data.rides.length})
+              🚵 Ritten — komende 3 maanden ({data.rides.length})
             </p>
             {data.rides.map(r => <RideRow key={r.id} ride={r} />)}
           </div>
