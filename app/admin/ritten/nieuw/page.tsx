@@ -147,10 +147,10 @@ export default function NieuweRitPage() {
         <div>
           <label className="block text-sm text-ink-200 mb-1.5">Afstand (km, optioneel)</label>
           <input
-            type="number"
-            step="0.5"
+            type="text"
             className="input"
             value={form.distance_km}
+            placeholder="bv. 48-58-68"
             onChange={e => setForm({ ...form, distance_km: e.target.value })}
           />
         </div>

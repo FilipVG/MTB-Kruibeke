@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       ride_type: 'jokerrit',
       start_at,
       start_location,
-      distance_km: distance_km ? Number(distance_km) : null,
+      distance_km: distance_km || null,
       in_ranking: true,
       points: 2,
       registration_open: true,

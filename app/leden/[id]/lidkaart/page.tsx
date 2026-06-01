@@ -27,13 +27,22 @@ export default async function LidkaartPage({ params }: { params: Promise<{ id: s
 
       <h1 className="text-2xl font-semibold text-white mt-4 mb-6">VWB Lidkaart</h1>
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={member.vwb_card_url}
-        alt="VWB lidkaart"
-        className="w-full rounded-xl border border-ink-700 shadow-lg object-cover"
-        style={{ aspectRatio: '85.6/54' }}
-      />
+      {member.vwb_card_url.includes('vwb-card.pdf') ? (
+        <iframe
+          src={member.vwb_card_url}
+          title="VWB lidkaart"
+          className="w-full rounded-xl border border-ink-700 shadow-lg"
+          style={{ height: '600px' }}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={member.vwb_card_url}
+          alt="VWB lidkaart"
+          className="w-full rounded-xl border border-ink-700 shadow-lg object-cover"
+          style={{ aspectRatio: '85.6/54' }}
+        />
+      )}
     </div>
   );
 }

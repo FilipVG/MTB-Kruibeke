@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { validateImageFile } from '@/lib/utils';
+import { validateVwbFile } from '@/lib/utils';
 import { CardCropper } from './CardCropper';
 
 interface Props {
@@ -22,12 +22,32 @@ export function VwbCardUpload({ profileId, hasCard }: Props) {
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const err = validateImageFile(file);
+    const err = validateVwbFile(file);
     if (err) { setMessage(err); e.target.value = ''; return; }
-    const reader = new FileReader();
-    reader.onload = () => setCardCropSrc(reader.result as string);
-    reader.readAsDataURL(file);
+    if (file.type === 'application/pdf') {
+      uploadPdf(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => setCardCropSrc(reader.result as string);
+      reader.readAsDataURL(file);
+    }
     e.target.value = '';
+  }
+
+  async function uploadPdf(file: File) {
+    setUploading(true);
+    setMessage(null);
+    const path = `${profileId}/vwb-card.pdf`;
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: 'application/pdf' });
+    if (error) { setMessage(`Upload mislukt: ${error.message}`); setUploading(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
+    await supabase.from('profiles').update({ vwb_card_url: `${publicUrl}?t=${Date.now()}` }).eq('id', profileId);
+    setUploaded(true);
+    setUploading(false);
+    setMessage('Lidkaart opgeslagen.');
+    router.refresh();
   }
 
   async function handleCropDone(blob: Blob) {
@@ -49,7 +69,10 @@ export function VwbCardUpload({ profileId, hasCard }: Props) {
 
   async function removeCard() {
     await supabase.from('profiles').update({ vwb_card_url: null }).eq('id', profileId);
-    await supabase.storage.from('avatars').remove([`${profileId}/vwb-card.jpg`]);
+    await supabase.storage.from('avatars').remove([
+      `${profileId}/vwb-card.jpg`,
+      `${profileId}/vwb-card.pdf`,
+    ]);
     setUploaded(false);
     setMessage(null);
     router.refresh();
@@ -62,7 +85,7 @@ export function VwbCardUpload({ profileId, hasCard }: Props) {
       )}
       <div className="flex items-center gap-3 flex-wrap">
         <label className="btn-secondary cursor-pointer">
-          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileSelect} className="hidden" />
+          <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleFileSelect} className="hidden" />
           {uploading ? 'Uploaden…' : uploaded ? 'Lidkaart vervangen' : 'Lidkaart uploaden'}
         </label>
         {uploaded && (

@@ -16,7 +16,7 @@ interface Props {
     ride_type: string;
     start_at: string;
     start_location: string;
-    distance_km: number | null;
+    distance_km: string | null;
     gpx_url: string | null;
     in_ranking: boolean;
     points: number;

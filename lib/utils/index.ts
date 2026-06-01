@@ -34,6 +34,28 @@ export function formatRideDate(date: string | Date): string {
   return `${label} · ${time}`;
 }
 
+export function formatMatchDateTime(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const label = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long',
+  }).format(d);
+  const time = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, hour: '2-digit', minute: '2-digit',
+  }).format(d);
+  return `${label} • ${time}u`;
+}
+
+export function formatShortDateTime(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const label = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, day: 'numeric', month: 'short',
+  }).format(d);
+  const time = new Intl.DateTimeFormat('nl-BE', {
+    timeZone: TZ, hour: '2-digit', minute: '2-digit',
+  }).format(d);
+  return `${label} ${time}u`;
+}
+
 export function formatShortDate(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date;
   return new Intl.DateTimeFormat('nl-BE', {
@@ -95,11 +117,22 @@ export function computeReminderAt(startAtUtc: string, daysBefore: number): strin
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 const MAX_GPX_BYTES = 5 * 1024 * 1024;
+const MAX_VWB_PDF_BYTES = 10 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function validateImageFile(file: File): string | null {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return 'Enkel JPG, PNG of WebP toegestaan.';
   if (file.size > MAX_AVATAR_BYTES) return 'Bestand mag maximaal 2 MB zijn.';
+  return null;
+}
+
+export function validateVwbFile(file: File): string | null {
+  if (file.type === 'application/pdf') {
+    if (file.size > MAX_VWB_PDF_BYTES) return 'PDF mag maximaal 10 MB zijn.';
+    return null;
+  }
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return 'Enkel JPG, PNG, WebP of PDF toegestaan.';
+  if (file.size > MAX_AVATAR_BYTES) return 'Afbeelding mag maximaal 2 MB zijn.';
   return null;
 }
 

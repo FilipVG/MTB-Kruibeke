@@ -92,10 +92,9 @@ export function JokerritForm({ rideId, initialValues }: Props) {
         <div>
           <label className="block text-sm text-ink-200 mb-1.5">Afstand (km, optioneel)</label>
           <input
-            type="number"
-            step="0.5"
-            min="0"
+            type="text"
             className="input"
+            placeholder="bv. 48-58-68"
             value={form.distance_km}
             onChange={e => setForm({ ...form, distance_km: e.target.value })}
           />

@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       description: description || null,
       start_at,
       start_location,
-      distance_km: distance_km ? Number(distance_km) : null,
+      distance_km: distance_km || null,
       reminder_at: computeReminderAt(start_at, 2),
     })
     .eq('id', id);

@@ -29,7 +29,7 @@ interface Ride {
   ride_type: 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
   start_at: string;
   start_location: string;
-  distance_km: number | null;
+  distance_km: string | null;
   gpx_url: string | null;
   in_ranking: boolean;
   points: number;
@@ -247,7 +247,7 @@ export default function RitBeheerPage() {
           </div>
           <div>
             <label className="block text-sm text-ink-200 mb-1.5">Afstand (km)</label>
-            <input type="number" step="0.5" className="input w-32" value={form.distance_km ?? ''} onChange={e => setForm({ ...form, distance_km: e.target.value ? Number(e.target.value) : null })} />
+            <input type="text" className="input w-32" placeholder="bv. 48-58-68" value={form.distance_km ?? ''} onChange={e => setForm({ ...form, distance_km: e.target.value || null })} />
           </div>
           <div>
             <label className="block text-sm text-ink-200 mb-1.5">Omschrijving</label>

@@ -31,7 +31,7 @@ export interface Ride {
   start_location: string;
   start_lat: number | null;
   start_lng: number | null;
-  distance_km: number | null;
+  distance_km: string | null;
   gpx_url: string | null;
   in_ranking: boolean;
   points: number;

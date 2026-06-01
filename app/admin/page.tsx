@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Calendar, Users, Star, Activity, Mail } from 'lucide-react';
+import { Calendar, Users, Star, Activity, Mail, Trophy } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getNewsletterData } from '@/lib/newsletter';
 
@@ -44,6 +44,14 @@ export default async function AdminPage() {
       title: 'Activiteiten beheren',
       desc: 'Plan andere activiteiten zoals BBQ&apos;s of vergaderingen.',
       icon: Activity,
+      stat: null,
+      statLabel: '',
+    },
+    {
+      href: '/admin/wk2026',
+      title: 'WK 2026 beheer',
+      desc: 'Scores ingeven, module aan/afzetten, knock-outwedstrijden toevoegen.',
+      icon: Trophy,
       stat: null,
       statLabel: '',
     },

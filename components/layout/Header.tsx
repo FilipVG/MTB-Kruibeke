@@ -21,12 +21,15 @@ const memberLinks = [
   { href: '/leden', label: 'Wie is wie' },
 ];
 
-export function Header({ profile }: { profile: Profile | null }) {
+export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2026Active: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
-  const allLinks = profile ? [...publicLinks, ...memberLinks] : publicLinks;
+  const wk2026Link = { href: '/wk2026', label: '🇧🇪 WK 2026' };
+  const allLinks = profile
+    ? [...publicLinks, ...memberLinks, ...(wk2026Active ? [wk2026Link] : [])]
+    : publicLinks;
 
   async function handleLogout() {
     const supabase = createClient();
