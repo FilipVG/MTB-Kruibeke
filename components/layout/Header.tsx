@@ -9,16 +9,19 @@ import { cn, getInitials } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/types/database';
 
-const publicLinks = [
+type NavLink = { href: string; label: string; external?: boolean };
+
+const publicLinks: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '/kalender', label: 'Kalender' },
   { href: '/sponsors', label: 'Sponsors' },
   { href: '/lid-worden', label: 'Lid worden' },
 ];
 
-const memberLinks = [
+const memberLinks: NavLink[] = [
   { href: '/klassement', label: 'Klassement' },
   { href: '/leden', label: 'Wie is wie' },
+  { href: 'https://photos.app.goo.gl/4nosNecYU9ZgdLQJA', label: "Foto's", external: true },
 ];
 
 export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2026Active: boolean }) {
@@ -26,7 +29,7 @@ export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2
   const pathname = usePathname();
   const router = useRouter();
 
-  const wk2026Link = { href: '/wk2026', label: '🇧🇪 WK 2026' };
+  const wk2026Link: NavLink = { href: '/wk2026', label: '🇧🇪 WK 2026' };
   const allLinks = profile
     ? [...publicLinks, ...memberLinks, ...(wk2026Active ? [wk2026Link] : [])]
     : publicLinks;
@@ -48,20 +51,32 @@ export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
-            {allLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'px-3 py-2 text-sm font-medium rounded-md transition',
-                  pathname === link.href
-                    ? 'text-white bg-ink-900'
-                    : 'text-ink-300 hover:text-white hover:bg-ink-900/50'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {allLinks.map(link =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 text-sm font-medium rounded-md transition text-ink-300 hover:text-white hover:bg-ink-900/50"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    'px-3 py-2 text-sm font-medium rounded-md transition',
+                    pathname === link.href
+                      ? 'text-white bg-ink-900'
+                      : 'text-ink-300 hover:text-white hover:bg-ink-900/50'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
 
           <div className="hidden lg:flex items-center gap-2">
@@ -110,21 +125,34 @@ export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2
         {/* Mobile nav */}
         {open && (
           <div className="lg:hidden border-t border-ink-800 py-3 space-y-1">
-            {allLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'block px-3 py-2.5 text-sm font-medium rounded-md',
-                  pathname === link.href
-                    ? 'text-white bg-ink-900'
-                    : 'text-ink-300 hover:bg-ink-900/50'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {allLinks.map(link =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2.5 text-sm font-medium rounded-md text-ink-300 hover:bg-ink-900/50"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'block px-3 py-2.5 text-sm font-medium rounded-md',
+                    pathname === link.href
+                      ? 'text-white bg-ink-900'
+                      : 'text-ink-300 hover:bg-ink-900/50'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
             <div className="pt-3 mt-3 border-t border-ink-800 space-y-2">
               {profile?.role === 'admin' && (
                 <Link

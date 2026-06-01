@@ -5,7 +5,7 @@ interface RideInfo {
   ride_type: string;
   in_ranking: boolean;
   points: number;
-  distance_km: number | null;
+  distance_km: string | null;
   description: string | null;
   id: string;
 }
