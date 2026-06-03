@@ -3,6 +3,7 @@ import { getCurrentUser, createClient } from '@/lib/supabase/server';
 import { ProfileForm } from '@/components/members/ProfileForm';
 import { MijnRitten } from '@/components/profiel/MijnRitten';
 import { VwbCardUpload } from '@/components/members/VwbCardUpload';
+import { fetchRideRatings } from '@/lib/reviews';
 
 export const metadata = { title: 'Mijn profiel — MTB Kruibeke' };
 
@@ -25,14 +26,19 @@ export default async function ProfielPage() {
     `)
     .eq('user_id', current.user.id);
 
-  const ritten = (regData ?? [])
+  const rittenRaw = (regData ?? [])
     .filter((r: any) => r.ride && r.ride.start_at >= startOfYear && r.ride.start_at < endOfYear && !r.ride.cancelled)
-    .sort((a: any, b: any) => new Date(a.ride.start_at).getTime() - new Date(b.ride.start_at).getTime())
-    .map((r: any) => ({
-      ...r.ride,
-      registration_id: r.id,
-      attended: r.attended,
-    }));
+    .sort((a: any, b: any) => new Date(a.ride.start_at).getTime() - new Date(b.ride.start_at).getTime());
+
+  const ratings = await fetchRideRatings(supabase, rittenRaw.map((r: any) => r.ride.id));
+
+  const ritten = rittenRaw.map((r: any) => ({
+    ...r.ride,
+    registration_id: r.id,
+    attended: r.attended,
+    avg_rating: ratings[r.ride.id]?.avg ?? null,
+    review_count: ratings[r.ride.id]?.count ?? 0,
+  }));
 
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 py-12 space-y-10">

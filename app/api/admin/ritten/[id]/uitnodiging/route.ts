@@ -29,5 +29,12 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const totalSent = await sendRideEmails(admin, ride, members, resend, siteUrl, from);
+
+  // Markeer als verstuurd zodat de automatische CRON deze rit niet nogmaals oppikt.
+  await admin
+    .from('rides')
+    .update({ reminder_sent_at: new Date().toISOString() })
+    .eq('id', id);
+
   return NextResponse.json({ sent: totalSent });
 }

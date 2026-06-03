@@ -57,11 +57,6 @@ export default async function LedenPage() {
               </div>
             </div>
 
-            {/* Bio */}
-            {member.bio && (
-              <p className="text-sm text-ink-300 leading-relaxed mb-4 line-clamp-3">{member.bio}</p>
-            )}
-
             {/* Contactinfo */}
             <div className="space-y-1.5 border-t border-ink-800 pt-3">
               {member.email && (

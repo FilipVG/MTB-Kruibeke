@@ -3,6 +3,8 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { getInitials, getDisplayName, cn } from '@/lib/utils';
 import { Shield, Phone, Mail, Clock, Check, CreditCard } from 'lucide-react';
 import Link from 'next/link';
+import { fetchRideRatings } from '@/lib/reviews';
+import { RatingBadge } from '@/components/rides/RatingBadge';
 
 function formatLastSeen(dateStr: string | null | undefined): string {
   if (!dateStr) return 'Nog nooit aangelogd';
@@ -62,6 +64,8 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
     for (const [rideId, count] of counts) if (count >= 4) qualifiedJokerrits.add(rideId);
   }
 
+  const ratings = await fetchRideRatings(supabase, ritten.map((r: any) => r.ride.id));
+
   return (
     <div className="mx-auto max-w-xl px-4 sm:px-6 py-12">
       <Link href="/leden" className="text-sm text-ink-400 hover:text-white mb-8 inline-flex items-center gap-1">
@@ -89,14 +93,6 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
             <p className="text-sm text-ink-400 mt-1">{member.first_name} {member.last_name}</p>
           )}
         </div>
-
-        {/* Bio */}
-        {member.bio && (
-          <div className="border-t border-ink-800 pt-6 mb-6">
-            <p className="text-xs font-medium text-ink-500 uppercase tracking-wide text-center mb-2">Over mezelf</p>
-            <p className="text-sm text-ink-300 leading-relaxed text-center">{member.bio}</p>
-          </div>
-        )}
 
         {/* Contactinfo */}
         <div className="border-t border-ink-800 pt-6 space-y-3">
@@ -145,9 +141,12 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
               return (
                 <div key={r.id} className={cn('flex items-center gap-3 py-2 px-1', isVoorbij && 'opacity-60')}>
                   <span className="w-20 shrink-0 text-xs text-ink-400 capitalize">{datumLabel}</span>
-                  <Link href={`/kalender/${r.ride.id}`} className="flex-1 min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
-                    {r.ride.title}
-                  </Link>
+                  <div className="flex-1 min-w-0 flex items-center gap-2">
+                    <Link href={`/kalender/${r.ride.id}`} className="min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
+                      {r.ride.title}
+                    </Link>
+                    <RatingBadge avg={ratings[r.ride.id]?.avg ?? 0} count={ratings[r.ride.id]?.count ?? 0} />
+                  </div>
                   {r.ride.in_ranking && (() => {
                     const isJokerrit = r.ride.ride_type === 'jokerrit';
                     const pts = isJokerrit && !qualifiedJokerrits.has(r.ride.id) ? 0 : r.ride.points;

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { Check, LogOut } from 'lucide-react';
+import { RatingBadge } from '@/components/rides/RatingBadge';
 
 interface RitRegel {
   id: string;
@@ -19,6 +20,8 @@ interface RitRegel {
   cancelled: boolean;
   registration_id: string;
   attended: boolean | null;
+  avg_rating?: number | null;
+  review_count?: number;
 }
 
 interface Props {
@@ -101,9 +104,12 @@ export function MijnRitten({ ritten, userId }: Props) {
             <span className="w-20 shrink-0 text-xs text-ink-400 capitalize">{datumLabel}</span>
 
             {/* Titel */}
-            <Link href={`/kalender/${rit.id}`} className="flex-1 min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
-              {rit.title}
-            </Link>
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <Link href={`/kalender/${rit.id}`} className="min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
+                {rit.title}
+              </Link>
+              <RatingBadge avg={rit.avg_rating ?? 0} count={rit.review_count ?? 0} />
+            </div>
 
             {/* Punten */}
             {rit.in_ranking && rit.points > 0 && (

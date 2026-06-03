@@ -50,7 +50,7 @@ export default async function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/kalender" className="btn-primary bg-white text-brand-900 hover:bg-ink-100">
-              Volgende rit bekijken
+              Ga naar kalender
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

@@ -16,7 +16,6 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     first_name: profile.first_name ?? '',
     last_name: profile.last_name ?? '',
     nickname: profile.nickname ?? '',
-    bio: profile.bio ?? '',
     phone: profile.phone ?? '',
     birthdate: profile.birthdate ?? '',
     email_reminders: profile.email_reminders ?? true,

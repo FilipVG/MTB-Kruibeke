@@ -4,6 +4,7 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { RideListItem } from '@/components/rides/RideListItem';
 import { ActivityListItem } from '@/components/activities/ActivityListItem';
 import { AbonneerKnop } from '@/components/kalender/AbonneerKnop';
+import { fetchRideRatings } from '@/lib/reviews';
 import type { Ride, Activity, RegistrationWithProfile } from '@/lib/types/database';
 
 export const metadata = { title: 'Kalender — MTB Kruibeke' };
@@ -40,10 +41,14 @@ export default async function KalenderPage({ searchParams }: Props) {
     .lt('start_at', totDatum)
     .order('start_at', { ascending: true });
 
+  const ratings = await fetchRideRatings(supabase, (rides ?? []).map((r: Ride) => r.id));
+
   const ridesWithMeta = (rides ?? []).map((r: Ride & { registrations: RegistrationWithProfile[] }) => ({
     ...r,
     registration_count: r.registrations?.length ?? 0,
     is_registered: current?.user ? r.registrations?.some(reg => reg.user_id === current.user.id) : false,
+    avg_rating: ratings[r.id]?.avg ?? null,
+    review_count: ratings[r.id]?.count ?? 0,
   }));
 
   // Activiteiten (enkel voor leden)
@@ -96,7 +101,9 @@ export default async function KalenderPage({ searchParams }: Props) {
               🤡 <span className="hidden sm:inline">Organiseer </span>Jokerrit
             </Link>
           )}
-          <AbonneerKnop url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtb-kruibeke.vercel.app'}/api/calendar.ics`} />
+          {current && (
+            <AbonneerKnop url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtb-kruibeke.vercel.app'}/api/calendar.ics`} />
+          )}
         </div>
       </div>
 

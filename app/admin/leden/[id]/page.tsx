@@ -14,7 +14,6 @@ interface Profile {
   email: string | null;
   phone: string | null;
   birthdate: string | null;
-  bio: string | null;
   role: string;
   is_active: boolean;
   avatar_url: string | null;
@@ -49,7 +48,6 @@ export default function LidBeheerPage() {
           email: data.email ?? '',
           phone: data.phone ?? '',
           birthdate: data.birthdate ?? '',
-          bio: data.bio ?? '',
           role: data.role ?? 'member',
           is_active: data.is_active,
           avatar_url: data.avatar_url ?? null,
@@ -83,7 +81,6 @@ export default function LidBeheerPage() {
       nickname: form.nickname || null,
       phone: form.phone || null,
       birthdate: form.birthdate || null,
-      bio: form.bio || null,
       role: form.role,
       avatar_url,
     }).eq('id', id);
@@ -224,12 +221,6 @@ export default function LidBeheerPage() {
               <input type="date" className="input" value={form.birthdate ?? ''}
                 onChange={e => setForm({ ...form, birthdate: e.target.value })} />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm text-ink-200 mb-1.5">Over mezelf</label>
-            <textarea className="input min-h-[80px]" value={form.bio ?? ''}
-              onChange={e => setForm({ ...form, bio: e.target.value })} />
           </div>
 
           <div>

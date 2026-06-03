@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Trophy, Download, Users, Check, X, Star } from 'lucide-react';
 import { formatRideDate, isRegistrationOpen, getDisplayName, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
+import { RatingBadge } from './RatingBadge';
 import type { Profile } from '@/lib/types/database';
 
 interface Props {
@@ -25,6 +26,8 @@ interface Props {
     registrations: { id: string; user_id: string; profile: Pick<Profile, 'id' | 'nickname' | 'first_name' | 'last_name' | 'avatar_url'> }[];
     registration_count: number;
     is_registered: boolean;
+    avg_rating?: number | null;
+    review_count?: number;
   };
   currentUserId: string | null;
   isAdmin: boolean;
@@ -105,9 +108,12 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
                 </span>
               )}
             </div>
-            <Link href={`/kalender/${ride.id}`} className="text-lg font-medium text-white hover:text-brand-200 transition">
-              {ride.title}
-            </Link>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link href={`/kalender/${ride.id}`} className="text-lg font-medium text-white hover:text-brand-200 transition">
+                {ride.title}
+              </Link>
+              <RatingBadge avg={ride.avg_rating ?? 0} count={ride.review_count ?? 0} />
+            </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-400">
               <span className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5" />

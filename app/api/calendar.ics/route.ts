@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { fetchRideRatings, formatRating } from '@/lib/reviews';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,8 @@ export async function GET() {
     .gte('start_at', lowerBound)
     .eq('cancelled', false);
 
+  const ratings = await fetchRideRatings(supabase, (rides ?? []).map(r => r.id));
+
   const site = process.env.NEXT_PUBLIC_SITE_URL || 'https://mtbkruibeke.be';
 
   const lines: string[] = [
@@ -78,7 +81,8 @@ export async function GET() {
     // Standaard duur 2.5u voor MTB
     const end = new Date(start.getTime() + 2.5 * 3600 * 1000);
     const emoji = ride.ride_type === 'mtb' ? '🚵' : ride.ride_type === 'gravel' ? '🚴' : ride.ride_type === 'jokerrit' ? '🤡' : '🏁';
-    const summary = `${emoji} ${ride.title}`;
+    const rating = ratings[ride.id];
+    const summary = `${emoji} ${ride.title}${rating ? ` ★ ${formatRating(rating.avg)}` : ''}`;
     lines.push(
       'BEGIN:VEVENT',
       `UID:ride-${ride.id}@mtbkruibeke.be`,

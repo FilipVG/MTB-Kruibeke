@@ -5,6 +5,8 @@ import { createClient, getCurrentUser } from '@/lib/supabase/server';
 import { formatRideDate, getDisplayName, getInitials, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
 import { RegistrationButton } from '@/components/rides/RegistrationButton';
 import { RideReviews } from '@/components/rides/RideReviews';
+import { RatingBadge } from '@/components/rides/RatingBadge';
+import { fetchRideRatings } from '@/lib/reviews';
 import type { Profile, RegistrationWithProfile } from '@/lib/types/database';
 
 export default async function RitDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +31,8 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
   const jokerritKwalificeert = ride.ride_type === 'jokerrit' && attendedCount >= 4;
   const isOrganisator = ride.ride_type === 'jokerrit' && current?.user?.id === ride.created_by;
   const isPastRide = new Date(ride.start_at) < new Date();
+  const ratings = await fetchRideRatings(supabase, [ride.id]);
+  const rating = ratings[ride.id];
 
   const { data: reviewsData } = isPastRide && current
     ? await supabase
@@ -94,9 +98,14 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
         </div>
 
         {/* Titel */}
-        <h1 className={cn('text-2xl sm:text-3xl font-semibold mb-2', isTopRit ? 'text-amber-50' : 'text-white')}>
-          {ride.title}
-        </h1>
+        <div className="flex items-center gap-3 flex-wrap mb-2">
+          <h1 className={cn('text-2xl sm:text-3xl font-semibold', isTopRit ? 'text-amber-50' : 'text-white')}>
+            {ride.title}
+          </h1>
+          {rating && (
+            <RatingBadge avg={rating.avg} count={rating.count} className="inline-flex items-center gap-1 text-sm font-medium text-amber-400" />
+          )}
+        </div>
         {ride.ride_type === 'jokerrit' && ride.creator && (
           <p className="text-sm text-purple-300 mb-4">
             🤡 Georganiseerd door{' '}
