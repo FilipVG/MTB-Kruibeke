@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fromDatetimeLocal, defaultStartAt } from '@/lib/utils';
+import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 function minStartDatetime(): string {
   const d = new Date();
@@ -87,6 +88,7 @@ export function JokerritForm({ rideId, initialValues }: Props) {
             value={form.start_at}
             onChange={e => setForm({ ...form, start_at: e.target.value })}
           />
+          <DateTimeEcho value={form.start_at} />
           <p className="text-xs text-ink-600 mt-1">Minstens 5 dagen in de toekomst.</p>
         </div>
         <div>

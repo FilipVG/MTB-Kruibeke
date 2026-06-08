@@ -17,6 +17,14 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { data: ride } = await admin.from('rides').select('*').eq('id', id).single();
   if (!ride) return NextResponse.json({ error: 'Rit niet gevonden' }, { status: 404 });
 
+  // Veiligheid: geen uitnodiging voor een rit die al gestart/voorbij is.
+  if (new Date(ride.start_at) <= new Date()) {
+    return NextResponse.json(
+      { error: 'Kan geen uitnodiging versturen voor een rit in het verleden.' },
+      { status: 400 },
+    );
+  }
+
   const { data: members } = await admin
     .from('profiles')
     .select('id, email, first_name, nickname')
@@ -30,10 +38,11 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   const totalSent = await sendRideEmails(admin, ride, members, resend, siteUrl, from);
 
-  // Markeer als verstuurd zodat de automatische CRON deze rit niet nogmaals oppikt.
+  // Markeer als verstuurd zodat de automatische CRON deze rit niet nogmaals
+  // oppikt, en reset de update-vlag (verse uitnodiging = geen pending wijziging).
   await admin
     .from('rides')
-    .update({ reminder_sent_at: new Date().toISOString() })
+    .update({ reminder_sent_at: new Date().toISOString(), update_pending: false })
     .eq('id', id);
 
   return NextResponse.json({ sent: totalSent });

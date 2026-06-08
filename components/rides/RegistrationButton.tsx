@@ -30,6 +30,7 @@ export function RegistrationButton({ rideId, registrationOpen, startAt, isRegist
       router.push(`/auth/login?redirect=/kalender/${rideId}`);
       return;
     }
+    if (isRegistered && !window.confirm('Wil je je uitschrijven voor deze rit?')) return;
     startTransition(async () => {
       if (isRegistered) {
         await supabase.from('ride_registrations').delete()

@@ -36,6 +36,7 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
       router.push('/auth/login?redirect=/kalender');
       return;
     }
+    if (activity.is_registered && !window.confirm('Wil je je uitschrijven voor deze activiteit?')) return;
     startTransition(async () => {
       if (activity.is_registered) {
         await supabase
@@ -56,10 +57,12 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
     activity.max_participants !== null &&
     activity.registration_count >= activity.max_participants;
 
+  const isPast = new Date(activity.start_at) <= new Date();
   const canRegister =
     activity.registration_required &&
     !activity.cancelled &&
-    (!registrationFull || activity.is_registered);
+    (!registrationFull || activity.is_registered) &&
+    !isPast;
 
   return (
     <article

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { PHASE_LABELS, OPPONENT_FLAGS } from '@/lib/wk2026/points';
 import type { WK2026Match, WK2026Phase } from '@/lib/wk2026/types';
 import { formatMatchDateTime } from '@/lib/utils';
+import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 import { Save, Plus, Power, Trash2 } from 'lucide-react';
 
 const PHASES: WK2026Phase[] = ['groep', 'achtste', 'kwart', 'halve', 'finale'];
@@ -237,6 +238,7 @@ export default function AdminWK2026Page() {
                   value={newMatch.start_at}
                   onChange={e => setNewMatch(p => ({ ...p, start_at: e.target.value }))}
                 />
+                <DateTimeEcho value={newMatch.start_at} />
               </div>
               <div>
                 <label className="block text-sm text-ink-300 mb-1">Locatie</label>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { fromDatetimeLocal, computeReminderAt, validateGpxFile, defaultStartAt } from '@/lib/utils';
+import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 export default function NieuweRitPage() {
   const router = useRouter();
@@ -105,6 +106,7 @@ export default function NieuweRitPage() {
               value={form.start_at}
               onChange={e => setForm({ ...form, start_at: e.target.value })}
             />
+            <DateTimeEcho value={form.start_at} />
           </div>
         </div>
 

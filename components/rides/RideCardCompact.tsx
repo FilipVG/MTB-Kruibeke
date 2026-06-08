@@ -37,6 +37,7 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       router.push('/auth/login?redirect=/');
       return;
     }
+    if (ride.is_registered && !window.confirm('Wil je je uitschrijven voor deze rit?')) return;
     startTransition(async () => {
       if (ride.is_registered) {
         await supabase.from('ride_registrations').delete()

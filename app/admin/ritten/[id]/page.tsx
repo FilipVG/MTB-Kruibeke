@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { formatRideDate, toDatetimeLocal, fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
+import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
 
@@ -36,6 +37,8 @@ interface Ride {
   registration_open: boolean;
   cancelled: boolean;
   reminder_at: string | null;
+  reminder_sent_at: string | null;
+  update_pending: boolean;
 }
 
 export default function RitBeheerPage() {
@@ -45,7 +48,7 @@ export default function RitBeheerPage() {
 
   const [ride, setRide] = useState<Ride | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [form, setForm] = useState<Omit<Ride, 'id'> | null>(null);
+  const [form, setForm] = useState<Omit<Ride, 'id' | 'reminder_sent_at' | 'update_pending'> | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -55,6 +58,9 @@ export default function RitBeheerPage() {
   const [memberSearch, setMemberSearch] = useState('');
   const [sendingInvite, setSendingInvite] = useState(false);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [updatePending, setUpdatePending] = useState(false);
+  const [sendingUpdate, setSendingUpdate] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const [sendReminder, setSendReminder] = useState(true);
   const [daysBefore, setDaysBefore] = useState(2);
 
@@ -78,6 +84,7 @@ export default function RitBeheerPage() {
           reminder_at: r.reminder_at,
         });
         setSendReminder(!!r.reminder_at);
+        setUpdatePending(r.update_pending ?? false);
         if (r.reminder_at) {
           const diff = Math.round((new Date(r.start_at).getTime() - new Date(r.reminder_at).getTime()) / 86400000);
           setDaysBefore(diff > 0 ? diff : 2);
@@ -119,6 +126,8 @@ export default function RitBeheerPage() {
       gpx_url = publicUrl;
     }
 
+    // Een wijziging ná een verstuurde uitnodiging zet de update-vlag aan.
+    const inviteWasSent = !!ride?.reminder_sent_at;
     const { error } = await supabase.from('rides').update({
       ...form,
       description: form.description || null,
@@ -126,9 +135,15 @@ export default function RitBeheerPage() {
       start_at: fromDatetimeLocal(form.start_at),
       reminder_at: sendReminder ? computeReminderAt(fromDatetimeLocal(form.start_at), daysBefore) : null,
       gpx_url,
+      update_pending: inviteWasSent,
     }).eq('id', id);
     setSaving(false);
-    setMessage(error ? `Fout: ${error.message}` : 'Opgeslagen.');
+    if (error) {
+      setMessage(`Fout: ${error.message}`);
+    } else {
+      setMessage('Opgeslagen.');
+      if (inviteWasSent) { setUpdatePending(true); setUpdateMessage(null); }
+    }
   }
 
   async function toggleAttendance(regId: string, current: boolean | null) {
@@ -167,6 +182,25 @@ export default function RitBeheerPage() {
     const json = await res.json();
     setSendingInvite(false);
     setInviteMessage(res.ok ? `Uitnodiging verstuurd naar ${json.sent} leden.` : (json.error ?? 'Fout'));
+    if (res.ok) {
+      setUpdatePending(false);
+      setUpdateMessage(null);
+      setRide(prev => prev ? { ...prev, reminder_sent_at: new Date().toISOString(), update_pending: false } : prev);
+    }
+  }
+
+  async function sendUpdate() {
+    setSendingUpdate(true);
+    setUpdateMessage(null);
+    const res = await fetch(`/api/admin/ritten/${id}/update`, { method: 'POST' });
+    const json = await res.json();
+    setSendingUpdate(false);
+    if (res.ok) {
+      setUpdatePending(false);
+      setUpdateMessage(json.sent > 0 ? `Update verstuurd naar ${json.sent} ingeschreven lid(eren).` : (json.message ?? 'Geen ontvangers.'));
+    } else {
+      setUpdateMessage(`Fout: ${json.error ?? 'Versturen mislukt.'}`);
+    }
   }
 
   async function handleDelete() {
@@ -215,6 +249,7 @@ export default function RitBeheerPage() {
             <div>
               <label className="block text-sm text-ink-200 mb-1.5">Datum & uur</label>
               <input required type="datetime-local" className="input" value={form.start_at} onChange={e => setForm({ ...form, start_at: e.target.value })} />
+              <DateTimeEcho value={form.start_at} />
             </div>
           </div>
           <div className="pt-1">
@@ -424,6 +459,29 @@ export default function RitBeheerPage() {
               {inviteMessage}
             </p>
           )}
+        </div>
+
+        {/* Update naar deelnemers — enkel relevant na een verstuurde uitnodiging */}
+        <div className="mt-5 pt-5 border-t border-ink-800">
+          <p className="text-sm text-ink-400 mb-3">
+            Heb je de rit gewijzigd na het versturen van de uitnodiging? Stuur een update
+            met de nieuwe gegevens, enkel naar de leden die ingeschreven zijn.
+          </p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={sendUpdate}
+              disabled={!updatePending || sendingUpdate}
+              className="btn-secondary disabled:opacity-40"
+              title={updatePending ? '' : 'Beschikbaar zodra je de rit wijzigt nadat de uitnodiging verstuurd is'}
+            >
+              {sendingUpdate ? 'Versturen…' : 'Stuur update naar deelnemers'}
+            </button>
+            {updateMessage && (
+              <p className={`text-sm ${updateMessage.startsWith('Fout') ? 'text-red-400' : 'text-green-400'}`}>
+                {updateMessage}
+              </p>
+            )}
+          </div>
         </div>
       </section>
 

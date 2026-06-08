@@ -22,6 +22,7 @@ interface RitRegel {
   attended: boolean | null;
   avg_rating?: number | null;
   review_count?: number;
+  points_earned: number;
 }
 
 interface Props {
@@ -111,9 +112,15 @@ export function MijnRitten({ ritten, userId }: Props) {
               <RatingBadge avg={rit.avg_rating ?? 0} count={rit.review_count ?? 0} />
             </div>
 
-            {/* Punten */}
-            {rit.in_ranking && rit.points > 0 && (
-              <span className="shrink-0 text-xs text-amber-400">{rit.points} pt</span>
+            {/* Punten — voorbije rit: werkelijk behaald (0 inbegrepen); komende rit: potentieel */}
+            {isVoorbij ? (
+              <span className={cn('shrink-0 text-xs', rit.points_earned > 0 ? 'text-amber-400' : 'text-ink-600')}>
+                {rit.points_earned} pt
+              </span>
+            ) : (
+              rit.in_ranking && rit.points > 0 && (
+                <span className="shrink-0 text-xs text-amber-400">{rit.points} pt</span>
+              )
             )}
 
             {/* Status / actie */}

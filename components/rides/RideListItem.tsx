@@ -48,6 +48,7 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
       router.push('/auth/login?redirect=/kalender');
       return;
     }
+    if (isRegistered && !window.confirm('Wil je je uitschrijven voor deze rit?')) return;
     startTransition(async () => {
       if (isRegistered) {
         await supabase

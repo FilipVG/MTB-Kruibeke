@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { defaultStartAt, fromDatetimeLocal } from '@/lib/utils';
+import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 export default function NieuweActiviteitPage() {
   const router = useRouter();
@@ -66,11 +67,13 @@ export default function NieuweActiviteitPage() {
             <label className="block text-sm text-ink-200 mb-1.5">Start datum & uur</label>
             <input required type="datetime-local" className="input" value={form.start_at}
               onChange={e => setForm({ ...form, start_at: e.target.value })} />
+            <DateTimeEcho value={form.start_at} />
           </div>
           <div>
             <label className="block text-sm text-ink-200 mb-1.5">Einde (optioneel)</label>
             <input type="datetime-local" className="input" value={form.end_at}
               onChange={e => setForm({ ...form, end_at: e.target.value })} />
+            <DateTimeEcho value={form.end_at} />
           </div>
         </div>
 

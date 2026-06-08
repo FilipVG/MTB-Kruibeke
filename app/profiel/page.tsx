@@ -32,13 +32,40 @@ export default async function ProfielPage() {
 
   const ratings = await fetchRideRatings(supabase, rittenRaw.map((r: any) => r.ride.id));
 
-  const ritten = rittenRaw.map((r: any) => ({
-    ...r.ride,
-    registration_id: r.id,
-    attended: r.attended,
-    avg_rating: ratings[r.ride.id]?.avg ?? null,
-    review_count: ratings[r.ride.id]?.count ?? 0,
-  }));
+  // Jokerrit telt enkel mee voor punten als er minstens 4 leden aanwezig waren.
+  const now = new Date();
+  const jokerritIds = rittenRaw
+    .filter((r: any) => r.ride.ride_type === 'jokerrit')
+    .map((r: any) => r.ride.id);
+  const qualifiedJokerrits = new Set<string>();
+  if (jokerritIds.length > 0) {
+    const { data: attendedRows } = await supabase
+      .from('ride_registrations')
+      .select('ride_id')
+      .in('ride_id', jokerritIds)
+      .eq('attended', true);
+    const counts = new Map<string, number>();
+    for (const row of attendedRows ?? []) counts.set(row.ride_id, (counts.get(row.ride_id) ?? 0) + 1);
+    for (const [rid, c] of counts) if (c >= 4) qualifiedJokerrits.add(rid);
+  }
+
+  const ritten = rittenRaw.map((r: any) => {
+    const isPast = new Date(r.ride.start_at) < now;
+    // Werkelijk behaalde punten: enkel bij aanwezigheid, en jokerrit enkel indien gekwalificeerd.
+    const pointsEarned = isPast && r.ride.in_ranking && r.attended === true
+      ? (r.ride.ride_type === 'jokerrit'
+          ? (qualifiedJokerrits.has(r.ride.id) ? r.ride.points : 0)
+          : r.ride.points)
+      : 0;
+    return {
+      ...r.ride,
+      registration_id: r.id,
+      attended: r.attended,
+      avg_rating: ratings[r.ride.id]?.avg ?? null,
+      review_count: ratings[r.ride.id]?.count ?? 0,
+      points_earned: pointsEarned,
+    };
+  });
 
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 py-12 space-y-10">
@@ -58,7 +85,7 @@ export default async function ProfielPage() {
 
       <div>
         <h2 className="text-xl font-semibold text-white mb-1">VWB Lidkaart</h2>
-        <p className="text-sm text-ink-400 mb-4">Upload een foto of scan van je VWB-lidkaart. Alleen zichtbaar voor jou en de admin.</p>
+        <p className="text-sm text-ink-400 mb-4">Upload een foto of scan van je VWB-lidkaart. Zichtbaar voor alle ingelogde leden.</p>
         <VwbCardUpload profileId={current.user.id} hasCard={!!current.profile.vwb_card_url} />
       </div>
     </div>

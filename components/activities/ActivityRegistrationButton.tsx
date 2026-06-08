@@ -18,6 +18,7 @@ export function ActivityRegistrationButton({ activityId, isRegistered, currentUs
   const supabase = createClient();
 
   async function toggle() {
+    if (isRegistered && !window.confirm('Wil je je uitschrijven voor deze activiteit?')) return;
     startTransition(async () => {
       if (isRegistered) {
         await supabase.from('activity_registrations').delete()
