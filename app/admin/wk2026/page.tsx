@@ -154,27 +154,39 @@ export default function AdminWK2026Page() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        min="0"
-                        max="20"
-                        className="input w-14 text-center text-sm"
-                        placeholder="–"
-                        value={s.belgium}
-                        onChange={e => setScores(prev => ({ ...prev, [match.id]: { ...s, belgium: e.target.value } }))}
-                      />
-                      <span className="text-ink-500">–</span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="20"
-                        className="input w-14 text-center text-sm"
-                        placeholder="–"
-                        value={s.opponent}
-                        onChange={e => setScores(prev => ({ ...prev, [match.id]: { ...s, opponent: e.target.value } }))}
-                      />
-                    </div>
+                    {(() => {
+                      const belgiumInput = (
+                        <input
+                          type="number"
+                          min="0"
+                          max="20"
+                          className="input w-14 text-center text-sm"
+                          placeholder="–"
+                          title="België"
+                          value={s.belgium}
+                          onChange={e => setScores(prev => ({ ...prev, [match.id]: { ...s, belgium: e.target.value } }))}
+                        />
+                      );
+                      const opponentInput = (
+                        <input
+                          type="number"
+                          min="0"
+                          max="20"
+                          className="input w-14 text-center text-sm"
+                          placeholder="–"
+                          title={match.opponent}
+                          value={s.opponent}
+                          onChange={e => setScores(prev => ({ ...prev, [match.id]: { ...s, opponent: e.target.value } }))}
+                        />
+                      );
+                      return (
+                        <div className="flex items-center gap-1">
+                          {match.is_belgium_home ? belgiumInput : opponentInput}
+                          <span className="text-ink-500">–</span>
+                          {match.is_belgium_home ? opponentInput : belgiumInput}
+                        </div>
+                      );
+                    })()}
                     <button
                       onClick={() => saveScore(match)}
                       disabled={saving === match.id}

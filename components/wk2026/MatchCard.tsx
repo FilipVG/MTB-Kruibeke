@@ -154,13 +154,21 @@ export function MatchCard({
       </div>
 
       <div className="px-5 py-5">
-        {/* Teams + score */}
-        <div className="flex items-center justify-center gap-6 mb-5">
-          <div className="text-center">
-            <div className="text-3xl mb-1">🇧🇪</div>
-            <div className="text-sm font-semibold text-white">België</div>
-          </div>
-          {hasScore ? (
+        {/* Teams + score — volgorde volgt thuis/uit (uitmatch: tegenstander links) */}
+        {(() => {
+          const belgiumTeam = (
+            <div className="text-center">
+              <div className="text-3xl mb-1">🇧🇪</div>
+              <div className="text-sm font-semibold text-white">België</div>
+            </div>
+          );
+          const opponentTeam = (
+            <div className="text-center">
+              <div className="text-3xl mb-1">{flag}</div>
+              <div className="text-sm font-semibold text-white">{match.opponent}</div>
+            </div>
+          );
+          const scoreBlock = hasScore ? (
             <div className="text-center">
               <div className="text-4xl font-bold text-white tabular-nums">
                 {match.is_belgium_home
@@ -171,12 +179,15 @@ export function MatchCard({
             </div>
           ) : (
             <div className="text-2xl font-bold text-ink-600">—</div>
-          )}
-          <div className="text-center">
-            <div className="text-3xl mb-1">{flag}</div>
-            <div className="text-sm font-semibold text-white">{match.opponent}</div>
-          </div>
-        </div>
+          );
+          return (
+            <div className="flex items-center justify-center gap-6 mb-5">
+              {match.is_belgium_home ? belgiumTeam : opponentTeam}
+              {scoreBlock}
+              {match.is_belgium_home ? opponentTeam : belgiumTeam}
+            </div>
+          );
+        })()}
 
         {/* Countdown */}
         {!started && countdown && (
@@ -194,15 +205,27 @@ export function MatchCard({
           <div className="rounded-lg border border-ink-800 p-4 space-y-4" style={{ background: '#111' }}>
             <p className="text-sm font-medium text-ink-300">Jouw voorspelling</p>
             <div className="flex items-center justify-center gap-3">
-              <div className="text-center">
-                <div className="text-xs text-ink-500 mb-1">🇧🇪 België</div>
-                <input type="number" min="0" max="20" className="input w-16 text-center text-lg font-bold" value={belgiumVal} onChange={e => setBelgiumVal(e.target.value)} placeholder="0" />
-              </div>
-              <span className="text-2xl font-bold text-ink-600 mt-4">—</span>
-              <div className="text-center">
-                <div className="text-xs text-ink-500 mb-1">{flag} {match.opponent}</div>
-                <input type="number" min="0" max="20" className="input w-16 text-center text-lg font-bold" value={opponentVal} onChange={e => setOpponentVal(e.target.value)} placeholder="0" />
-              </div>
+              {(() => {
+                const belgiumInput = (
+                  <div className="text-center">
+                    <div className="text-xs text-ink-500 mb-1">🇧🇪 België</div>
+                    <input type="number" min="0" max="20" className="input w-16 text-center text-lg font-bold" value={belgiumVal} onChange={e => setBelgiumVal(e.target.value)} placeholder="0" />
+                  </div>
+                );
+                const opponentInput = (
+                  <div className="text-center">
+                    <div className="text-xs text-ink-500 mb-1">{flag} {match.opponent}</div>
+                    <input type="number" min="0" max="20" className="input w-16 text-center text-lg font-bold" value={opponentVal} onChange={e => setOpponentVal(e.target.value)} placeholder="0" />
+                  </div>
+                );
+                return (
+                  <>
+                    {match.is_belgium_home ? belgiumInput : opponentInput}
+                    <span className="text-2xl font-bold text-ink-600 mt-4">—</span>
+                    {match.is_belgium_home ? opponentInput : belgiumInput}
+                  </>
+                );
+              })()}
             </div>
 
             <div className="flex items-center justify-between flex-wrap gap-2">
