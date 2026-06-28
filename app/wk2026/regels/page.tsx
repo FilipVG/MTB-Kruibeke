@@ -5,7 +5,8 @@ import type { WK2026Phase } from '@/lib/wk2026/types';
 
 export const metadata = { title: 'WK 2026 Spelregels — MTB Kruibeke' };
 
-const phases: WK2026Phase[] = ['groep', 'achtste', 'kwart', 'halve', 'finale'];
+// Afgeleid uit PHASE_LABELS zodat de tabel altijd alle fases bevat (incl. 1/16).
+const phases = Object.keys(PHASE_LABELS) as WK2026Phase[];
 
 export default function WK2026RegelsPage() {
   return (
