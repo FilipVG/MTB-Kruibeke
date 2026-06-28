@@ -22,6 +22,7 @@ export const OPPONENT_FLAGS: Record<string, string> = {
   'Egypte': '🇪🇬',
   'Iran': '🇮🇷',
   'Nieuw-Zeeland': '🇳🇿',
+  'Senegal': '🇸🇳',
 };
 
 type MatchResult = 'win' | 'draw' | 'loss';
