@@ -8,10 +8,10 @@ import { formatMatchDateTime } from '@/lib/utils';
 import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 import { Save, Plus, Power, Trash2 } from 'lucide-react';
 
-const PHASES: WK2026Phase[] = ['groep', 'achtste', 'kwart', 'halve', 'finale'];
+const PHASES: WK2026Phase[] = ['groep', 'zestiende', 'achtste', 'kwart', 'halve', 'finale'];
 
 const EMPTY_FORM = {
-  phase: 'achtste' as WK2026Phase,
+  phase: 'zestiende' as WK2026Phase,
   opponent: '',
   is_belgium_home: true,
   start_at: '',

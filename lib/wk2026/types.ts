@@ -1,4 +1,4 @@
-export type WK2026Phase = 'groep' | 'achtste' | 'kwart' | 'halve' | 'finale';
+export type WK2026Phase = 'groep' | 'zestiende' | 'achtste' | 'kwart' | 'halve' | 'finale';
 
 export interface WK2026Match {
   id: string;

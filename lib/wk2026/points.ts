@@ -1,19 +1,21 @@
 import type { WK2026Phase } from './types';
 
 export const PHASE_POINTS: Record<WK2026Phase, { result: number; score: number }> = {
-  groep:   { result: 3, score: 5 },
-  achtste: { result: 4, score: 7 },
-  kwart:   { result: 5, score: 9 },
-  halve:   { result: 6, score: 11 },
-  finale:  { result: 7, score: 13 },
+  groep:     { result: 3, score: 5 },
+  zestiende: { result: 4, score: 7 },
+  achtste:   { result: 5, score: 9 },
+  kwart:     { result: 6, score: 11 },
+  halve:     { result: 7, score: 13 },
+  finale:    { result: 8, score: 15 },
 };
 
 export const PHASE_LABELS: Record<WK2026Phase, string> = {
-  groep:   'Groepsfase',
-  achtste: '1/8 finale',
-  kwart:   '1/4 finale',
-  halve:   '1/2 finale',
-  finale:  'Finale',
+  groep:     'Groepsfase',
+  zestiende: '1/16 finale',
+  achtste:   '1/8 finale',
+  kwart:     '1/4 finale',
+  halve:     '1/2 finale',
+  finale:    'Finale',
 };
 
 export const OPPONENT_FLAGS: Record<string, string> = {
