@@ -22,7 +22,7 @@ export default async function LedenPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(members ?? []).map(member => (
-          <Link key={member.id} href={`/leden/${member.id}`} className="card p-5 block hover:border-brand-700/50 hover:bg-ink-900/60 transition">
+          <Link key={member.id} href={`/leden/${member.id}`} className="card p-5 block relative z-0 hover:z-50 hover:border-brand-700/50 hover:bg-ink-900/60 transition">
             {/* Avatar + naam */}
             <div className="flex items-start gap-4 mb-4">
               <div className="relative shrink-0 hover:z-50">
@@ -31,11 +31,11 @@ export default async function LedenPage() {
                   <img
                     src={member.avatar_url}
                     alt=""
-                    className="h-14 w-14 rounded-full object-cover cursor-zoom-in origin-top-left transition-[transform,border-radius,box-shadow] duration-200 hover:scale-[2.5] hover:rounded-xl hover:shadow-2xl"
+                    className="h-14 w-14 rounded-full object-cover cursor-zoom-in origin-top-left transition-[transform,border-radius,box-shadow] duration-200 hover:scale-[3.5] hover:rounded-xl hover:shadow-2xl"
                   />
                 ) : (
                   <div className={cn(
-                    'h-14 w-14 rounded-full flex items-center justify-center font-medium text-white cursor-zoom-in origin-top-left transition-[transform,border-radius] duration-200 hover:scale-[2.5] hover:rounded-xl hover:shadow-2xl',
+                    'h-14 w-14 rounded-full flex items-center justify-center font-medium text-white cursor-zoom-in origin-top-left transition-[transform,border-radius] duration-200 hover:scale-[3.5] hover:rounded-xl hover:shadow-2xl',
                     'bg-brand-700'
                   )}>
                     {getInitials(member)}

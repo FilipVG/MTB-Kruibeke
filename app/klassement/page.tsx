@@ -83,7 +83,7 @@ export default async function KlassementPage({ searchParams }: Props) {
                 return (
                   <div key={entry.id} className="text-center">
                     <div className="text-3xl mb-1">{medals[place as 1 | 2 | 3]}</div>
-                    <Link href={`/leden/${entry.id}`}>
+                    <Link href={`/leden/${entry.id}`} className="block relative z-0 hover:z-30">
                       <Avatar entry={entry} size="lg" />
                     </Link>
                     <Link href={`/leden/${entry.id}`} className="mt-2 text-sm font-medium text-white truncate hover:text-brand-300 transition block">{getDisplayName(entry)}</Link>
@@ -113,7 +113,7 @@ export default async function KlassementPage({ searchParams }: Props) {
               const place = podium.length < 3 ? idx + 1 : idx + 4;
               const medal = place === 1 ? '🥇' : place === 2 ? '🥈' : place === 3 ? '🥉' : null;
               return (
-                <Link key={entry.id} href={`/leden/${entry.id}`} className="flex items-center gap-4 p-3 sm:p-4 hover:bg-ink-800/40 transition">
+                <Link key={entry.id} href={`/leden/${entry.id}`} className="flex items-center gap-4 p-3 sm:p-4 relative z-0 hover:z-30 hover:bg-ink-800/40 transition">
                   <span className="w-8 text-center text-sm font-medium text-ink-400">
                     {medal ?? place}
                   </span>
@@ -137,14 +137,18 @@ export default async function KlassementPage({ searchParams }: Props) {
 
 function Avatar({ entry, size }: { entry: RankingEntry; size: 'sm' | 'lg' }) {
   const cls = size === 'lg' ? 'h-16 w-16 text-base' : 'h-9 w-9 text-xs';
+  // Kleinere hover-zoom dan op "Wie is wie" (daar 3,5×). Groeit inwaarts zodat
+  // ze niet tegen de rand botst: lijst naar rechts, podium vanaf onder.
+  const origin = size === 'lg' ? 'origin-bottom' : 'origin-left';
+  const zoom = `relative hover:z-20 cursor-zoom-in ${origin} transition-[transform,border-radius,box-shadow] duration-200 hover:scale-[1.6] hover:rounded-xl hover:shadow-2xl`;
   if (entry.avatar_url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={entry.avatar_url} alt="" className={cn(cls, 'rounded-full object-cover mx-auto')} />
+      <img src={entry.avatar_url} alt="" className={cn(cls, zoom, 'rounded-full object-cover mx-auto')} />
     );
   }
   return (
-    <div className={cn(cls, 'rounded-full bg-brand-700 flex items-center justify-center font-medium text-white mx-auto')}>
+    <div className={cn(cls, zoom, 'rounded-full bg-brand-700 flex items-center justify-center font-medium text-white mx-auto')}>
       {getInitials(entry)}
     </div>
   );
