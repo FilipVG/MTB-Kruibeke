@@ -77,9 +77,9 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
         <div className="flex flex-col items-center text-center mb-6">
           {member.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={member.avatar_url} alt="" className="h-28 w-28 rounded-full object-cover mb-4" />
+            <img src={member.avatar_url} alt="" className="h-28 w-28 rounded-full object-cover mb-4 relative z-10 hover:z-50 cursor-zoom-in origin-center transition-[transform,border-radius,box-shadow] duration-200 hover:scale-[2.5] hover:rounded-2xl hover:shadow-2xl" />
           ) : (
-            <div className="h-28 w-28 rounded-full bg-brand-700 flex items-center justify-center text-3xl font-medium text-white mb-4">
+            <div className="h-28 w-28 rounded-full bg-brand-700 flex items-center justify-center text-3xl font-medium text-white mb-4 relative z-10 hover:z-50 cursor-zoom-in origin-center transition-[transform,border-radius] duration-200 hover:scale-[2.5] hover:rounded-2xl">
               {getInitials(member)}
             </div>
           )}
