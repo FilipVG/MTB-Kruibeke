@@ -25,8 +25,9 @@ export default async function WK2026Page() {
   if (startedMatchIds.length > 0) {
     const { data } = await supabase
       .from('wk2026_predictions')
-      .select('*, profile:profiles(id, first_name, last_name, nickname, avatar_url)')
-      .in('match_id', startedMatchIds);
+      .select('*, profile:profiles!inner(id, first_name, last_name, nickname, avatar_url)')
+      .in('match_id', startedMatchIds)
+      .eq('profile.is_active', true);
     allPredictions = (data ?? []) as WK2026PredictionWithProfile[];
   }
 
