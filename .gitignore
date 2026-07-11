@@ -15,3 +15,25 @@ out/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code local config
+.claude/
+
+# demo materiaal
+DEMO-SCRIPT.md
+MTB-Kruibeke-Demo.pptx
+MTB-Kruibeke-Demoscript.docx
+scripts/build-demo-pptx.py
+scripts/build-demo-script-docx.py
+
+# ad-hoc scripts
+scripts/gen-barcode.mjs
+scripts/barcode-2013257305109.svg
+scripts/import-members.mjs
+
+# debug/scratch testbestanden
+test-activity-edit-bug.js
+test-datetime-local.js
+test-display-bug.js
+test-timezone.js
+test-timezone-winter.js
