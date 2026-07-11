@@ -8,10 +8,12 @@ export default async function HomePage() {
   const supabase = await createClient();
   const current = await getCurrentUser();
 
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
   const { data: upcomingRides } = await supabase
     .from('rides')
     .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
-    .gte('start_at', new Date().toISOString())
+    .gte('start_at', oneDayAgo)
     .eq('cancelled', false)
     .order('start_at', { ascending: true })
     .limit(3);

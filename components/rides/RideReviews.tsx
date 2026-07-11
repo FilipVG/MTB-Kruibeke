@@ -97,7 +97,7 @@ export function RideReviews({ rideId, initialReviews, currentUserId }: Props) {
   }
 
   return (
-    <div className="card p-6 mt-4">
+    <div id="reviews" className="card p-6 mt-4">
       <h2 className="font-semibold text-white mb-1 flex items-center gap-2">
         <MessageSquare className="h-4 w-4 text-ink-400" />
         Reviews

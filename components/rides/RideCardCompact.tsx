@@ -49,13 +49,14 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
     });
   }
 
-  const canRegister = ride.registration_open && !ride.cancelled;
+  const hasStarted = new Date(ride.start_at) <= new Date();
+  const canRegister = ride.registration_open && !ride.cancelled && !hasStarted;
   const isTopRit = ride.in_ranking && ride.points === 5;
 
   const diffDagen = Math.ceil(
     (new Date(ride.start_at).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) / 86400000
   );
-  const countdownLabel = diffDagen === 0 ? 'Vandaag' : diffDagen === 1 ? 'Morgen' : `Nog ${diffDagen} dagen`;
+  const countdownLabel = hasStarted ? 'Bezig / voorbij' : diffDagen === 0 ? 'Vandaag' : diffDagen === 1 ? 'Morgen' : `Nog ${diffDagen} dagen`;
 
   return (
     <div className={cn(
@@ -110,6 +111,7 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
           </div>
           <span className={cn(
             'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium',
+            hasStarted ? 'bg-ink-800 text-ink-400' :
             diffDagen === 0 ? 'bg-green-900/50 text-green-300' :
             diffDagen <= 7 ? 'bg-brand-900/50 text-brand-300' :
             'bg-ink-800 text-ink-400'
@@ -130,7 +132,14 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       </div>
 
       {/* Knop */}
-      {canRegister && (
+      {hasStarted && !ride.cancelled ? (
+        <Link
+          href={currentUserId ? `/kalender/${ride.id}#reviews` : `/kalender/${ride.id}`}
+          className="mt-auto w-full rounded-md px-3 py-1.5 text-sm font-medium transition border border-brand-700/40 bg-brand-900/30 text-brand-200 hover:bg-brand-900/50 flex items-center justify-center gap-1.5"
+        >
+          <Star className="h-3.5 w-3.5" /> Geef een review
+        </Link>
+      ) : canRegister && (
         <button
           onClick={toggleRegistration}
           disabled={pending}
