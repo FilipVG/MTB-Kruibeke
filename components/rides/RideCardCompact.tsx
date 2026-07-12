@@ -135,9 +135,9 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       {hasStarted && !ride.cancelled ? (
         <Link
           href={currentUserId ? `/kalender/${ride.id}#reviews` : `/kalender/${ride.id}`}
-          className="mt-auto w-full rounded-md px-3 py-1.5 text-sm font-medium transition border border-brand-700/40 bg-brand-900/30 text-brand-200 hover:bg-brand-900/50 flex items-center justify-center gap-1.5"
+          className="mt-auto w-full rounded-md px-3 py-1.5 text-sm font-semibold transition bg-amber-500 text-ink-950 hover:bg-amber-400 flex items-center justify-center gap-1.5"
         >
-          <Star className="h-3.5 w-3.5" /> Geef een review
+          <Star className="h-3.5 w-3.5 fill-ink-950" /> Geef een review
         </Link>
       ) : canRegister && (
         <button
