@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { createClient, getCurrentUser } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/supabase/server';
 import './globals.css';
 
 const inter = Inter({
@@ -22,14 +22,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const current = await getCurrentUser();
-  const supabase = await createClient();
-  const { data: wk2026 } = await supabase.from('wk2026_settings').select('active').single();
-  const wk2026Active = wk2026?.active ?? false;
 
   return (
     <html lang="nl" className={inter.variable}>
       <body className="min-h-screen flex flex-col">
-        <Header profile={current?.profile ?? null} wk2026Active={wk2026Active} />
+        <Header profile={current?.profile ?? null} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

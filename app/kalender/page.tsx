@@ -18,8 +18,7 @@ interface Props {
 
 export default async function KalenderPage({ searchParams }: Props) {
   const supabase = await createClient();
-  const current = await getCurrentUser();
-  const params = await searchParams;
+  const [current, params] = await Promise.all([getCurrentUser(), searchParams]);
 
   const now = new Date();
   const jaar = parseInt(params.jaar ?? String(now.getFullYear()));
@@ -33,13 +32,24 @@ export default async function KalenderPage({ searchParams }: Props) {
   const vorigeLink = `?maand=${vorigeDate.getMonth() + 1}&jaar=${vorigeDate.getFullYear()}`;
   const volgendeLink = `?maand=${volgendeDate.getMonth() + 1}&jaar=${volgendeDate.getFullYear()}`;
 
-  // Ritten (publiek)
-  const { data: rides } = await supabase
-    .from('rides')
-    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
-    .gte('start_at', vanDatum)
-    .lt('start_at', totDatum)
-    .order('start_at', { ascending: true });
+  // Ritten (publiek) + activiteiten (enkel voor leden) zijn onafhankelijk: parallel.
+  type ActivityRow = Activity & { registrations: { id: string; user_id: string }[] };
+  const [{ data: rides }, { data: activities }] = await Promise.all([
+    supabase
+      .from('rides')
+      .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
+      .gte('start_at', vanDatum)
+      .lt('start_at', totDatum)
+      .order('start_at', { ascending: true }),
+    current
+      ? supabase
+          .from('activities')
+          .select(`*, registrations:activity_registrations(id, user_id)`)
+          .gte('start_at', vanDatum)
+          .lt('start_at', totDatum)
+          .order('start_at', { ascending: true })
+      : Promise.resolve({ data: [] as ActivityRow[] }),
+  ]);
 
   const ratings = await fetchRideRatings(supabase, (rides ?? []).map((r: Ride) => r.id));
 
@@ -53,22 +63,11 @@ export default async function KalenderPage({ searchParams }: Props) {
 
   // Activiteiten (enkel voor leden)
   type ActivityWithMeta = Activity & { registration_count: number; is_registered: boolean };
-  let activitiesWithMeta: ActivityWithMeta[] = [];
-
-  if (current) {
-    const { data: activities } = await supabase
-      .from('activities')
-      .select(`*, registrations:activity_registrations(id, user_id)`)
-      .gte('start_at', vanDatum)
-      .lt('start_at', totDatum)
-      .order('start_at', { ascending: true });
-
-    activitiesWithMeta = (activities ?? []).map((a: Activity & { registrations: { id: string; user_id: string }[] }) => ({
-      ...a,
-      registration_count: a.registrations?.length ?? 0,
-      is_registered: a.registrations?.some(r => r.user_id === current.user.id) ?? false,
-    }));
-  }
+  const activitiesWithMeta: ActivityWithMeta[] = (activities ?? []).map((a: ActivityRow) => ({
+    ...a,
+    registration_count: a.registrations?.length ?? 0,
+    is_registered: current?.user ? a.registrations?.some(r => r.user_id === current.user.id) ?? false : false,
+  }));
 
   // Samenvoegen en sorteren op datum
   type CalendarItem =

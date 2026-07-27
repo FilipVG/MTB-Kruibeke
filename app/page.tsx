@@ -6,30 +6,32 @@ import type { Ride, Sponsor, RegistrationWithProfile } from '@/lib/types/databas
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const current = await getCurrentUser();
 
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-  const { data: upcomingRides } = await supabase
-    .from('rides')
-    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
-    .gte('start_at', oneDayAgo)
-    .eq('cancelled', false)
-    .order('start_at', { ascending: true })
-    .limit(3);
+  // Profiel + ritten + sponsors zijn onderling onafhankelijk: parallel ophalen.
+  const [current, { data: upcomingRides }, { data: sponsors }] = await Promise.all([
+    getCurrentUser(),
+    supabase
+      .from('rides')
+      .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
+      .gte('start_at', oneDayAgo)
+      .eq('cancelled', false)
+      .order('start_at', { ascending: true })
+      .limit(3),
+    supabase
+      .from('sponsors')
+      .select('*')
+      .eq('is_active', true)
+      .order('tier', { ascending: true }) // 'main' komt alfabetisch vóór 'regular'
+      .order('display_order', { ascending: true }),
+  ]);
 
   const ridesWithMeta = (upcomingRides ?? []).map((r: Ride & { registrations: RegistrationWithProfile[] }) => ({
     ...r,
     registration_count: r.registrations?.length ?? 0,
     is_registered: current?.user ? r.registrations?.some(reg => reg.user_id === current.user.id) : false,
   }));
-
-  const { data: sponsors } = await supabase
-    .from('sponsors')
-    .select('*')
-    .eq('is_active', true)
-    .order('tier', { ascending: true }) // 'main' komt alfabetisch vóór 'regular'
-    .order('display_order', { ascending: true });
 
   const mainSponsors = (sponsors ?? []).filter((s: Sponsor) => s.tier === 'main');
   const regularSponsors = (sponsors ?? []).filter((s: Sponsor) => s.tier === 'regular');

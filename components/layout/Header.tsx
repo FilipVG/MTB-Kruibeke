@@ -24,14 +24,13 @@ const memberLinks: NavLink[] = [
   { href: 'https://photos.app.goo.gl/4nosNecYU9ZgdLQJA', label: "Foto's", external: true },
 ];
 
-export function Header({ profile, wk2026Active }: { profile: Profile | null; wk2026Active: boolean }) {
+export function Header({ profile }: { profile: Profile | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
-  const wk2026Link: NavLink = { href: '/wk2026', label: '🇧🇪 WK 2026' };
   const allLinks = profile
-    ? [...publicLinks, ...memberLinks, ...(wk2026Active ? [wk2026Link] : [])]
+    ? [...publicLinks, ...memberLinks]
     : publicLinks;
 
   async function handleLogout() {
