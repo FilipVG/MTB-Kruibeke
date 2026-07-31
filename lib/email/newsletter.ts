@@ -96,8 +96,10 @@ export function buildNewsletterEmail(
   siteUrl: string,
   issue: NewsletterIssue,
   introText = '',
+  testMode = false,
 ): { subject: string; html: string } {
   const editie = `${issue.year} nr ${issue.number}`;
+  const titel = testMode ? 'TEST Off-Road Update' : 'Off-Road Update';
   const changedItems = [...rides, ...activities]
     .filter(i => i.status !== 'existing')
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
@@ -243,8 +245,8 @@ export function buildNewsletterEmail(
 </html>`;
 
   const subject = changedItems.length === 1
-    ? `📬 Off-Road Update ${editie} — ${changedItems[0].title}`
-    : `📬 Off-Road Update ${editie} — ${changedItems.length} nieuwe items op de agenda`;
+    ? `📬 ${titel} ${editie} — ${changedItems[0].title}`
+    : `📬 ${titel} ${editie} — ${changedItems.length} nieuwe items op de agenda`;
 
   return { subject, html };
 }

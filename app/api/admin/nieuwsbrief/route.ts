@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   // Zelfde nummer voor test én echt: test toont wat het zou worden, maar
   // persisteert niets (geen newsletter_runs-insert in testmodus).
   const issue = await getNextIssueNumber(supabase);
-  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl, issue, intro_text);
+  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl, issue, intro_text, test_mode);
 
   const admin = createAdminClient();
 
