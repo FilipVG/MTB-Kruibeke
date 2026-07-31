@@ -19,6 +19,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     phone: profile.phone ?? '',
     birthdate: profile.birthdate ?? '',
     email_reminders: profile.email_reminders ?? true,
+    review_reminders: profile.review_reminders ?? true,
     wants_newsletter: profile.wants_newsletter ?? true,
   });
   const [avatarPreview, setAvatarPreview] = useState(profile.avatar_url);
@@ -135,6 +136,18 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             <div>
               <p className="text-sm text-ink-200">Stuur rituitnodiging</p>
               <p className="text-xs text-ink-500">Ontvang een e-mail vóór elke rit om je in te schrijven.</p>
+            </div>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer mt-3">
+            <input
+              type="checkbox"
+              checked={form.review_reminders}
+              onChange={e => setForm({ ...form, review_reminders: e.target.checked })}
+              className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500 h-4 w-4"
+            />
+            <div>
+              <p className="text-sm text-ink-200">Review-herinnering</p>
+              <p className="text-xs text-ink-500">Ontvang na een rit een e-mail met de vraag om een review achter te laten.</p>
             </div>
           </label>
           <label className="flex items-center gap-3 cursor-pointer mt-3">

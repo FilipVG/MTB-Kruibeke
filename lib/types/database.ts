@@ -16,6 +16,7 @@ export interface Profile {
   role: UserRole;
   is_active: boolean;
   email_reminders: boolean;
+  review_reminders: boolean;
   wants_newsletter: boolean;
   last_seen_at: string | null;
   created_at: string;
@@ -41,6 +42,7 @@ export interface Ride {
   created_by: string | null;
   reminder_at: string | null;
   reminder_sent_at: string | null;
+  review_reminder_sent_at: string | null;
   created_at: string;
   updated_at: string;
 }
