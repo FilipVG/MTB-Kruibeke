@@ -45,6 +45,25 @@
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
+  /* WYSIWYG-editor voor de nieuwsbrief-introtekst */
+  .rte-editor {
+    @apply text-left;
+  }
+  .rte-editor:empty::before {
+    content: attr(data-placeholder);
+    @apply text-ink-500;
+    pointer-events: none;
+  }
+  .rte-editor ul {
+    @apply list-disc pl-5 my-1;
+  }
+  .rte-editor ol {
+    @apply list-decimal pl-5 my-1;
+  }
+  .rte-editor a {
+    @apply text-brand-300 underline;
+  }
+
   .badge-mtb {
     @apply badge bg-brand-700/20 text-brand-200 border border-brand-700/30;
   }
