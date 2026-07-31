@@ -125,12 +125,13 @@ export default function NieuweRitPage() {
               <label className="text-sm text-ink-400">Hoeveel dagen op voorhand:</label>
               <input
                 type="number"
-                min="1"
+                min="0"
                 max="30"
                 className="input w-20"
                 value={daysBefore}
                 onChange={e => setDaysBefore(Number(e.target.value))}
               />
+              <span className="text-xs text-ink-500">(0 = de dag zelf)</span>
             </div>
           )}
         </div>

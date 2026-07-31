@@ -86,8 +86,13 @@ export default function RitBeheerPage() {
         setSendReminder(!!r.reminder_at);
         setUpdatePending(r.update_pending ?? false);
         if (r.reminder_at) {
-          const diff = Math.round((new Date(r.start_at).getTime() - new Date(r.reminder_at).getTime()) / 86400000);
-          setDaysBefore(diff > 0 ? diff : 2);
+          // reminder_at staat op 00:00 UTC van (startdatum − N dagen). Vergelijk
+          // daarom met de startdatum op 00:00 UTC — niet met de starttijd zelf —
+          // anders rondt bv. een rit om 19:00 (0 dagen vooraf) af naar 1.
+          const s = new Date(r.start_at);
+          const startMidnightUTC = Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate());
+          const diff = Math.round((startMidnightUTC - new Date(r.reminder_at).getTime()) / 86400000);
+          setDaysBefore(diff >= 0 ? diff : 2);
         }
       }
       const { data: regs } = await supabase
@@ -267,12 +272,13 @@ export default function RitBeheerPage() {
                 <label className="text-sm text-ink-400">Hoeveel dagen op voorhand:</label>
                 <input
                   type="number"
-                  min="1"
+                  min="0"
                   max="30"
                   className="input w-20"
                   value={daysBefore}
                   onChange={e => setDaysBefore(Number(e.target.value))}
                 />
+                <span className="text-xs text-ink-500">(0 = de dag zelf)</span>
               </div>
             )}
           </div>
