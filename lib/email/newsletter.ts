@@ -181,7 +181,7 @@ export function buildNewsletterEmail(
                   <h1 style="margin:6px 0 0;font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-0.02em;">Off-Road Update</h1>
                   <p style="margin:5px 0 0;font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:0.04em;">${editie}</p>
                   <p style="margin:3px 0 0;font-size:13px;color:rgba(255,255,255,0.55);">
-                    MTB Kruibeke &mdash; agenda komende 12 maanden
+                    MTB Kruibeke &mdash; Nieuwsbrief &mdash; Agenda
                   </p>
                 </td>
                 <td style="vertical-align:middle;text-align:right;width:80px;padding-left:16px;">
