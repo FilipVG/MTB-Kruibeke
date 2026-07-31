@@ -1,6 +1,6 @@
 import { Mail, CheckCircle, Clock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { getNewsletterData } from '@/lib/newsletter';
+import { getNewsletterData, getNextIssueNumber } from '@/lib/newsletter';
 import { VerstuurKnop } from './VerstuurKnop';
 import type { NewsletterRide, NewsletterActivity, NewsletterItemStatus } from '@/lib/newsletter';
 
@@ -80,11 +80,12 @@ function ActivityRow({ activity }: { activity: NewsletterActivity }) {
 
 export default async function AdminNieuwsbriefPage() {
   const supabase = await createClient();
-  const [data, { data: runs }, { data: settings }] = await Promise.all([
+  const [data, issue, { data: runs }, { data: settings }] = await Promise.all([
     getNewsletterData(supabase),
+    getNextIssueNumber(supabase),
     supabase
       .from('newsletter_runs')
-      .select('id, sent_at, recipient_count, test_mode, new_item_count')
+      .select('id, sent_at, recipient_count, test_mode, new_item_count, issue_year, issue_number')
       .order('sent_at', { ascending: false })
       .limit(10),
     supabase
@@ -116,7 +117,12 @@ export default async function AdminNieuwsbriefPage() {
       {/* Komende nieuwsbrief — preview */}
       <section className="card overflow-hidden">
         <div className="px-5 py-4 border-b border-ink-800">
-          <h2 className="font-semibold text-white">Komende nieuwsbrief</h2>
+          <h2 className="font-semibold text-white flex items-center gap-2">
+            Komende nieuwsbrief
+            <span className="badge bg-amber-900/40 text-amber-300 border border-amber-800 text-xs font-semibold">
+              {issue.year} nr {issue.number}
+            </span>
+          </h2>
           <p className="text-xs text-ink-400 mt-0.5">
             {totalChanged > 0
               ? `${totalChanged} nieuwe/gewijzigde item${totalChanged !== 1 ? 's' : ''} · ${data.rides.length} ritt${data.rides.length !== 1 ? 'en' : ''} · ${data.activities.length} activiteit${data.activities.length !== 1 ? 'en' : ''} in de komende periode`
@@ -185,6 +191,9 @@ export default async function AdminNieuwsbriefPage() {
             {(runs ?? []).map((run: any) => (
               <div key={run.id} className="flex items-center justify-between px-5 py-3 gap-4 flex-wrap">
                 <div className="text-sm">
+                  {run.issue_number && (
+                    <span className="text-amber-300 font-medium mr-2">{run.issue_year} nr {run.issue_number}</span>
+                  )}
                   <span className="text-white capitalize">{fmtDate(run.sent_at)}</span>
                   <span className="text-ink-500 ml-3">{run.new_item_count} nieuwe items</span>
                 </div>

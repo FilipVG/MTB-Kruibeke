@@ -41,6 +41,35 @@ export interface NewsletterData {
   changedCount: number;
 }
 
+export interface NewsletterIssue {
+  year: number;
+  number: number;
+}
+
+/**
+ * Bepaalt het editienummer voor de eerstvolgende Off-Road Update.
+ * Nummer = aantal echte (niet-test) verzendingen in het lopende jaar + 1.
+ * Testverzendingen worden niet gelogd, dus tellen niet mee; bij een nieuw jaar
+ * zijn er 0 runs en start de reeks opnieuw op 1.
+ */
+export async function getNextIssueNumber(supabase: SupabaseClient): Promise<NewsletterIssue> {
+  // Huidig jaar in Belgische tijd, consistent met de datumopmaak in de mails.
+  const year = Number(
+    new Intl.DateTimeFormat('nl-BE', { timeZone: 'Europe/Brussels', year: 'numeric' }).format(new Date()),
+  );
+  const yearStart = new Date(Date.UTC(year, 0, 1)).toISOString();
+  const nextYearStart = new Date(Date.UTC(year + 1, 0, 1)).toISOString();
+
+  const { count } = await supabase
+    .from('newsletter_runs')
+    .select('*', { count: 'exact', head: true })
+    .eq('test_mode', false)
+    .gte('sent_at', yearStart)
+    .lt('sent_at', nextYearStart);
+
+  return { year, number: (count ?? 0) + 1 };
+}
+
 export async function getNewsletterData(supabase: SupabaseClient): Promise<NewsletterData> {
   const now = new Date().toISOString();
   const in3Months = new Date();

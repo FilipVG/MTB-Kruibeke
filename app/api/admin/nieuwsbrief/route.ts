@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { requireAdmin } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getNewsletterData } from '@/lib/newsletter';
+import { getNewsletterData, getNextIssueNumber } from '@/lib/newsletter';
 import { buildNewsletterEmail } from '@/lib/email/newsletter';
 
 export async function POST(request: Request) {
@@ -25,7 +25,10 @@ export async function POST(request: Request) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtbkruibeke.be';
-  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl, intro_text);
+  // Zelfde nummer voor test én echt: test toont wat het zou worden, maar
+  // persisteert niets (geen newsletter_runs-insert in testmodus).
+  const issue = await getNextIssueNumber(supabase);
+  const { subject, html } = buildNewsletterEmail(data.rides, data.activities, siteUrl, issue, intro_text);
 
   const admin = createAdminClient();
 
@@ -59,6 +62,8 @@ export async function POST(request: Request) {
       recipient_count: totalSent,
       test_mode: false,
       new_item_count: data.changedCount,
+      issue_year: issue.year,
+      issue_number: issue.number,
     });
     // Introtekst wissen na verzending naar leden
     await admin.from('newsletter_settings').upsert({ id: 1, intro_text: '', updated_at: new Date().toISOString() });

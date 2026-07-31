@@ -1,4 +1,4 @@
-import type { NewsletterRide, NewsletterActivity } from '@/lib/newsletter';
+import type { NewsletterRide, NewsletterActivity, NewsletterIssue } from '@/lib/newsletter';
 
 function fmtDate(iso: string): string {
   return new Intl.DateTimeFormat('nl-BE', {
@@ -94,8 +94,10 @@ export function buildNewsletterEmail(
   rides: NewsletterRide[],
   activities: NewsletterActivity[],
   siteUrl: string,
+  issue: NewsletterIssue,
   introText = '',
 ): { subject: string; html: string } {
+  const editie = `${issue.year} nr ${issue.number}`;
   const changedItems = [...rides, ...activities]
     .filter(i => i.status !== 'existing')
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
@@ -177,7 +179,8 @@ export function buildNewsletterEmail(
                 <td style="vertical-align:middle;">
                   <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.2em;text-transform:uppercase;">Mountainbike club · Waasland</p>
                   <h1 style="margin:6px 0 0;font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-0.02em;">Off-Road Update</h1>
-                  <p style="margin:5px 0 0;font-size:13px;color:rgba(255,255,255,0.55);">
+                  <p style="margin:5px 0 0;font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:0.04em;">${editie}</p>
+                  <p style="margin:3px 0 0;font-size:13px;color:rgba(255,255,255,0.55);">
                     MTB Kruibeke &mdash; agenda komende 12 maanden
                   </p>
                 </td>
@@ -240,8 +243,8 @@ export function buildNewsletterEmail(
 </html>`;
 
   const subject = changedItems.length === 1
-    ? `📬 Off-Road Update — ${changedItems[0].title}`
-    : `📬 Off-Road Update — ${changedItems.length} nieuwe items op de agenda`;
+    ? `📬 Off-Road Update ${editie} — ${changedItems[0].title}`
+    : `📬 Off-Road Update ${editie} — ${changedItems.length} nieuwe items op de agenda`;
 
   return { subject, html };
 }
