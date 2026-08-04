@@ -16,7 +16,7 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
 
   const { data: ride } = await supabase
     .from('rides')
-    .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url)), creator:profiles!rides_created_by_fkey(id, nickname, first_name, last_name)`)
+    .select(`*, registrations:ride_registrations(id, user_id, attended, profile:profiles(id, nickname, first_name, last_name, avatar_url)), creator:profiles!rides_created_by_fkey(id, nickname, first_name, last_name)`)
     .eq('id', id)
     .single();
 
