@@ -89,6 +89,8 @@ export default function NieuweRitPage() {
               onChange={e => {
                 const type = e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd';
                 setForm({ ...form, ride_type: type, in_ranking: true, points: DEFAULT_POINTS[type] });
+                // Wedstrijd: geen inschrijvingsmail als standaard (admin kan aanzetten).
+                setSendReminder(type !== 'wedstrijd');
               }}
             >
               <option value="mtb">MTB</option>
