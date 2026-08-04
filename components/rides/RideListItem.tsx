@@ -15,6 +15,7 @@ interface Props {
     title: string;
     description: string | null;
     ride_type: string;
+    is_jokerrit?: boolean;
     start_at: string;
     start_location: string;
     distance_km: string | null;
@@ -85,6 +86,9 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
               <span className={rideTypeBadge(ride.ride_type)}>
                 {rideTypeLabel(ride.ride_type)}
               </span>
+              {ride.is_jokerrit && (
+                <span className="badge-jokerrit">🤡 Jokerrit</span>
+              )}
               {ride.in_ranking && ride.points > 0 && (
                 isTopRit ? (
                   <span className="badge bg-amber-800/50 text-amber-300 border border-amber-600/50">

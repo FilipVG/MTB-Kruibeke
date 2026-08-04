@@ -14,6 +14,7 @@ interface RitRegel {
   start_at: string;
   start_location: string;
   ride_type: string;
+  is_jokerrit?: boolean;
   points: number;
   in_ranking: boolean;
   registration_open: boolean;
@@ -107,7 +108,7 @@ export function MijnRitten({ ritten, userId }: Props) {
             {/* Titel */}
             <div className="flex-1 min-w-0 flex items-center gap-2">
               <Link href={`/kalender/${rit.id}`} className="min-w-0 text-sm font-medium text-white hover:text-brand-300 truncate">
-                {rit.title}
+                {rit.is_jokerrit && <span title="Jokerrit">🤡 </span>}{rit.title}
               </Link>
               <RatingBadge avg={rit.avg_rating ?? 0} count={rit.review_count ?? 0} />
             </div>

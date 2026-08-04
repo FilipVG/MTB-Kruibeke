@@ -87,26 +87,39 @@ export function isRegistrationOpen(ride: { start_at: string; registration_open: 
   return ride.registration_open && !ride.cancelled && !isPast(new Date(ride.start_at));
 }
 
+// Standaardpunten per rittype. Admins kunnen dit per rit aanpassen; deze waarden
+// worden enkel als default gebruikt bij het aanmaken van een nieuwe rit.
+export const DEFAULT_POINTS: Record<'mtb' | 'gravel' | 'baanrit' | 'wedstrijd', number> = {
+  mtb: 2,
+  baanrit: 1,
+  gravel: 1,
+  wedstrijd: 1,
+};
+
 export function rideTypeBadge(type: string): string {
   if (type === 'mtb') return 'badge-mtb';
   if (type === 'gravel') return 'badge-gravel';
-  if (type === 'jokerrit') return 'badge-jokerrit';
+  if (type === 'wedstrijd') return 'badge-wedstrijd';
   return 'badge-baanrit';
 }
 
 export function rideTypeLabel(type: string): string {
   if (type === 'mtb') return 'MTB';
   if (type === 'gravel') return 'Gravel';
-  if (type === 'jokerrit') return 'Jokerrit';
+  if (type === 'wedstrijd') return 'Wedstrijd';
   return 'Training';
 }
 
 export function rideTypeEmoji(type: string): string {
   if (type === 'mtb') return '🚵';
   if (type === 'gravel') return '🚴';
-  if (type === 'jokerrit') return '🤡';
+  if (type === 'wedstrijd') return '🏆';
   return '🏁';
 }
+
+// Jokerrit is een eigenschap los van het type — vaste marker voor weergave.
+export const JOKERRIT_LABEL = 'Jokerrit';
+export const JOKERRIT_EMOJI = '🤡';
 
 export function computeReminderAt(startAtUtc: string, daysBefore: number): string {
   const d = new Date(startAtUtc);

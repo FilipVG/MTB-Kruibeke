@@ -21,7 +21,7 @@ export default async function ProfielPage() {
     .select(`
       id,
       attended,
-      ride:rides(id, title, start_at, start_location, ride_type,
+      ride:rides(id, title, start_at, start_location, ride_type, is_jokerrit,
         points, in_ranking, registration_open, cancelled)
     `)
     .eq('user_id', current.user.id);
@@ -35,7 +35,7 @@ export default async function ProfielPage() {
   // Jokerrit telt enkel mee voor punten als er minstens 4 leden aanwezig waren.
   const now = new Date();
   const jokerritIds = rittenRaw
-    .filter((r: any) => r.ride.ride_type === 'jokerrit')
+    .filter((r: any) => r.ride.is_jokerrit)
     .map((r: any) => r.ride.id);
   const qualifiedJokerrits = new Set<string>();
   if (jokerritIds.length > 0) {
@@ -53,7 +53,7 @@ export default async function ProfielPage() {
     const isPast = new Date(r.ride.start_at) < now;
     // Werkelijk behaalde punten: enkel bij aanwezigheid, en jokerrit enkel indien gekwalificeerd.
     const pointsEarned = isPast && r.ride.in_ranking && r.attended === true
-      ? (r.ride.ride_type === 'jokerrit'
+      ? (r.ride.is_jokerrit
           ? (qualifiedJokerrits.has(r.ride.id) ? r.ride.points : 0)
           : r.ride.points)
       : 0;

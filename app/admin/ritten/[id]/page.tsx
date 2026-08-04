@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { formatRideDate, toDatetimeLocal, fromDatetimeLocal, computeReminderAt, validateGpxFile } from '@/lib/utils';
+import { formatRideDate, toDatetimeLocal, fromDatetimeLocal, computeReminderAt, validateGpxFile, DEFAULT_POINTS } from '@/lib/utils';
 import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 import { Check, X, Trash2, AlertTriangle, UserPlus } from 'lucide-react';
@@ -27,13 +27,14 @@ interface Ride {
   id: string;
   title: string;
   description: string | null;
-  ride_type: 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
+  ride_type: 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd';
   start_at: string;
   start_location: string;
   distance_km: string | null;
   gpx_url: string | null;
   in_ranking: boolean;
   points: number;
+  is_jokerrit: boolean;
   registration_open: boolean;
   cancelled: boolean;
   reminder_at: string | null;
@@ -79,6 +80,7 @@ export default function RitBeheerPage() {
           gpx_url: r.gpx_url,
           in_ranking: r.in_ranking,
           points: r.points,
+          is_jokerrit: r.is_jokerrit,
           registration_open: r.registration_open,
           cancelled: r.cancelled,
           reminder_at: r.reminder_at,
@@ -244,11 +246,11 @@ export default function RitBeheerPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-ink-200 mb-1.5">Type</label>
-              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit' })}>
+              <select className="input" value={form.ride_type} onChange={e => setForm({ ...form, ride_type: e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd' })}>
                 <option value="mtb">MTB</option>
                 <option value="gravel">Gravel</option>
                 <option value="baanrit">Training op de baan</option>
-                <option value="jokerrit">Jokerrit</option>
+                <option value="wedstrijd">Wedstrijd</option>
               </select>
             </div>
             <div>
@@ -319,7 +321,7 @@ export default function RitBeheerPage() {
           </div>
           <div className="flex flex-wrap gap-4 pt-2 border-t border-ink-800">
             <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer">
-              <input type="checkbox" checked={form.in_ranking} onChange={e => setForm({ ...form, in_ranking: e.target.checked, points: e.target.checked ? (form.points || 2) : 0 })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
+              <input type="checkbox" checked={form.in_ranking} onChange={e => setForm({ ...form, in_ranking: e.target.checked, points: e.target.checked ? (form.points || DEFAULT_POINTS[form.ride_type]) : 0 })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
               Telt voor klassement
             </label>
             {form.in_ranking && (
@@ -328,6 +330,10 @@ export default function RitBeheerPage() {
                 <input type="number" min="0" max="5" className="input w-20" value={form.points} onChange={e => setForm({ ...form, points: Number(e.target.value) })} />
               </div>
             )}
+            <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer">
+              <input type="checkbox" checked={form.is_jokerrit} onChange={e => setForm({ ...form, is_jokerrit: e.target.checked })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
+              🤡 Jokerrit
+            </label>
             <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer">
               <input type="checkbox" checked={form.registration_open} onChange={e => setForm({ ...form, registration_open: e.target.checked })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
               Inschrijvingen open

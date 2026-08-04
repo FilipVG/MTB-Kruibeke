@@ -18,7 +18,7 @@ function formatDate(iso: string): string {
 function rideTypeEmoji(type: string): string {
   if (type === 'mtb') return '🚵';
   if (type === 'gravel') return '🚴';
-  if (type === 'jokerrit') return '🤡';
+  if (type === 'wedstrijd') return '🏆';
   return '🏁';
 }
 

@@ -17,7 +17,7 @@ function fmtTime(iso: string): string {
 
 function rideTypeLabel(type: string): string {
   const map: Record<string, string> = {
-    mtb: '🚵 MTB', gravel: '🚴 Gravel', jokerrit: '🤡 Jokerrit', baanrit: '🏁 Training',
+    mtb: '🚵 MTB', gravel: '🚴 Gravel', wedstrijd: '🏆 Wedstrijd', baanrit: '🏁 Training',
   };
   return map[type] ?? type;
 }

@@ -131,7 +131,9 @@ export default async function AdminRittenPage({ searchParams }: Props) {
                           <span className="line-through">{ride.title}</span>
                           <span className="ml-1 text-[10px] font-bold not-italic">Afgelast!</span>
                         </>
-                      ) : ride.title}
+                      ) : (
+                        <>{ride.is_jokerrit && '🤡 '}{ride.title}</>
+                      )}
                     </Link>
                   ))}
                 </div>

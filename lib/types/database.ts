@@ -1,5 +1,5 @@
 export type UserRole = 'member' | 'admin';
-export type RideType = 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
+export type RideType = 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd';
 export type SponsorTier = 'main' | 'regular';
 
 export interface Profile {
@@ -36,6 +36,7 @@ export interface Ride {
   gpx_url: string | null;
   in_ranking: boolean;
   points: number;
+  is_jokerrit: boolean;
   registration_open: boolean;
   max_participants: number | null;
   cancelled: boolean;

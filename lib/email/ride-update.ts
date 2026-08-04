@@ -26,7 +26,7 @@ function formatTime(iso: string): string {
 function rideTypeLabel(type: string): string {
   if (type === 'mtb') return 'MTB';
   if (type === 'gravel') return 'Gravel';
-  if (type === 'jokerrit') return 'Jokerrit';
+  if (type === 'wedstrijd') return 'Wedstrijd';
   return 'Training op de baan';
 }
 

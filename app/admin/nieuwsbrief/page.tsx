@@ -29,7 +29,7 @@ const STATUS_BADGE: Record<NewsletterItemStatus, { label: string; cls: string } 
 };
 
 function rideTypeLabel(type: string) {
-  const map: Record<string, string> = { mtb: 'MTB', gravel: 'Gravel', jokerrit: 'Jokerrit', baanrit: 'Training' };
+  const map: Record<string, string> = { mtb: 'MTB', gravel: 'Gravel', wedstrijd: 'Wedstrijd', baanrit: 'Training' };
   return map[type] ?? type;
 }
 

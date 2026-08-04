@@ -79,4 +79,8 @@
   .badge-jokerrit {
     @apply badge bg-purple-900/30 text-purple-300 border border-purple-700/40;
   }
+
+  .badge-wedstrijd {
+    @apply badge bg-red-900/30 text-red-300 border border-red-700/40;
+  }
 }

@@ -13,6 +13,7 @@ interface Props {
     id: string;
     title: string;
     ride_type: string;
+    is_jokerrit?: boolean;
     start_at: string;
     start_location: string;
     in_ranking: boolean;
@@ -75,6 +76,7 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
           <span className={rideTypeBadge(ride.ride_type)}>
             {rideTypeLabel(ride.ride_type)}
           </span>
+          {ride.is_jokerrit && <span className="badge-jokerrit">🤡</span>}
           {ride.in_ranking && ride.points > 0 && (
             isTopRit ? (
               <span className="badge bg-amber-800/50 text-amber-300 border border-amber-600/50">

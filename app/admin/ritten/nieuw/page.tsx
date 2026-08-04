@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { fromDatetimeLocal, computeReminderAt, validateGpxFile, defaultStartAt } from '@/lib/utils';
+import { fromDatetimeLocal, computeReminderAt, validateGpxFile, defaultStartAt, DEFAULT_POINTS } from '@/lib/utils';
 import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
 
 export default function NieuweRitPage() {
@@ -14,12 +14,13 @@ export default function NieuweRitPage() {
   const [form, setForm] = useState({
     title: '',
     description: '',
-    ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit',
+    ride_type: 'mtb' as 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd',
     start_at: defaultStartAt(1),
     start_location: '',
     distance_km: '',
     in_ranking: true,
     points: 2,
+    is_jokerrit: false,
   });
   const [sendReminder, setSendReminder] = useState(true);
   const [daysBefore, setDaysBefore] = useState(2);
@@ -47,7 +48,7 @@ export default function NieuweRitPage() {
       .from('rides')
       .insert({
         ...form,
-        distance_km: form.distance_km ? Number(form.distance_km) : null,
+        distance_km: form.distance_km || null,
         start_at: fromDatetimeLocal(form.start_at),
         reminder_at: sendReminder && form.start_at ? computeReminderAt(fromDatetimeLocal(form.start_at), daysBefore) : null,
         gpx_url,
@@ -86,15 +87,14 @@ export default function NieuweRitPage() {
               className="input"
               value={form.ride_type}
               onChange={e => {
-                const type = e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'jokerrit';
-                const isRanking = type === 'mtb' || type === 'jokerrit';
-                setForm({ ...form, ride_type: type, in_ranking: isRanking, points: isRanking ? 2 : 0 });
+                const type = e.target.value as 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd';
+                setForm({ ...form, ride_type: type, in_ranking: true, points: DEFAULT_POINTS[type] });
               }}
             >
               <option value="mtb">MTB</option>
               <option value="gravel">Gravel</option>
               <option value="baanrit">Training op de baan</option>
-              <option value="jokerrit">Jokerrit</option>
+              <option value="wedstrijd">Wedstrijd</option>
             </select>
           </div>
           <div>
@@ -190,7 +190,7 @@ export default function NieuweRitPage() {
             <input
               type="checkbox"
               checked={form.in_ranking}
-              onChange={e => setForm({ ...form, in_ranking: e.target.checked, points: e.target.checked ? 2 : 0 })}
+              onChange={e => setForm({ ...form, in_ranking: e.target.checked, points: e.target.checked ? DEFAULT_POINTS[form.ride_type] : 0 })}
               className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500"
             />
             <span className="text-sm text-ink-200">Telt mee voor puntenklassement</span>
@@ -207,6 +207,19 @@ export default function NieuweRitPage() {
                 onChange={e => setForm({ ...form, points: Number(e.target.value) })}
               />
             </div>
+          )}
+
+          <label className="flex items-center gap-2 mt-4">
+            <input
+              type="checkbox"
+              checked={form.is_jokerrit}
+              onChange={e => setForm({ ...form, is_jokerrit: e.target.checked })}
+              className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500"
+            />
+            <span className="text-sm text-ink-200">🤡 Jokerrit</span>
+          </label>
+          {form.is_jokerrit && (
+            <p className="text-xs text-ink-500 mt-1">Telt enkel mee voor het klassement als minstens 4 leden bevestigd aanwezig waren.</p>
           )}
         </div>
 

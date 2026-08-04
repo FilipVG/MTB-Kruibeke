@@ -80,7 +80,7 @@ export async function GET() {
     const start = new Date(ride.start_at);
     // Standaard duur 2.5u voor MTB
     const end = new Date(start.getTime() + 2.5 * 3600 * 1000);
-    const emoji = ride.ride_type === 'mtb' ? '🚵' : ride.ride_type === 'gravel' ? '🚴' : ride.ride_type === 'jokerrit' ? '🤡' : '🏁';
+    const emoji = ride.is_jokerrit ? '🤡' : ride.ride_type === 'mtb' ? '🚵' : ride.ride_type === 'gravel' ? '🚴' : ride.ride_type === 'wedstrijd' ? '🏆' : '🏁';
     const rating = ratings[ride.id];
     const summary = `${emoji} ${ride.title}${rating ? ` ★ ${formatRating(rating.avg)}` : ''}`;
     lines.push(

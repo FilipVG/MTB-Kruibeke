@@ -13,11 +13,11 @@ export default async function JokerritBewerkenPage({ params }: { params: Promise
   const supabase = await createClient();
   const { data: ride } = await supabase
     .from('rides')
-    .select('id, title, description, start_at, start_location, distance_km, ride_type, created_by')
+    .select('id, title, description, start_at, start_location, distance_km, ride_type, is_jokerrit, created_by')
     .eq('id', id)
     .single();
 
-  if (!ride || ride.ride_type !== 'jokerrit') notFound();
+  if (!ride || !ride.is_jokerrit) notFound();
   if (ride.created_by !== current.user.id) redirect(`/kalender/${id}`);
 
   return (
@@ -32,6 +32,7 @@ export default async function JokerritBewerkenPage({ params }: { params: Promise
           start_at: toDatetimeLocal(ride.start_at),
           start_location: ride.start_location,
           distance_km: ride.distance_km ? String(ride.distance_km) : '',
+          ride_type: (ride.ride_type ?? 'mtb') as 'mtb' | 'gravel' | 'baanrit' | 'wedstrijd',
         }}
       />
     </div>

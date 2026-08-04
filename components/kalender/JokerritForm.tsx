@@ -2,8 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fromDatetimeLocal, defaultStartAt } from '@/lib/utils';
+import { fromDatetimeLocal, defaultStartAt, DEFAULT_POINTS } from '@/lib/utils';
 import { DateTimeEcho } from '@/components/ui/DateTimeEcho';
+
+const TYPE_OPTIONS: { value: keyof typeof DEFAULT_POINTS; label: string }[] = [
+  { value: 'mtb', label: 'MTB' },
+  { value: 'baanrit', label: 'Training op de baan' },
+  { value: 'gravel', label: 'Gravel' },
+  { value: 'wedstrijd', label: 'Wedstrijd' },
+];
 
 function minStartDatetime(): string {
   const d = new Date();
@@ -19,6 +26,7 @@ interface Props {
     start_at: string; // datetime-local formaat
     start_location: string;
     distance_km: string;
+    ride_type?: keyof typeof DEFAULT_POINTS;
   };
 }
 
@@ -30,6 +38,7 @@ export function JokerritForm({ rideId, initialValues }: Props) {
   const [form, setForm] = useState({
     title: initialValues?.title ?? '',
     description: initialValues?.description ?? '',
+    ride_type: initialValues?.ride_type ?? 'mtb' as keyof typeof DEFAULT_POINTS,
     start_at: initialValues?.start_at ?? defaultStartAt(5),
     start_location: initialValues?.start_location ?? '',
     distance_km: initialValues?.distance_km ?? '',
@@ -75,6 +84,20 @@ export function JokerritForm({ rideId, initialValues }: Props) {
           onChange={e => setForm({ ...form, title: e.target.value })}
           placeholder="bv. Zondagse Jokerrit Stekene"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm text-ink-200 mb-1.5">Type rit</label>
+        <select
+          className="input"
+          value={form.ride_type}
+          onChange={e => setForm({ ...form, ride_type: e.target.value as keyof typeof DEFAULT_POINTS })}
+        >
+          {TYPE_OPTIONS.map(o => (
+            <option key={o.value} value={o.value}>{o.label} — {DEFAULT_POINTS[o.value]} punt{DEFAULT_POINTS[o.value] !== 1 ? 'en' : ''}</option>
+          ))}
+        </select>
+        <p className="text-xs text-ink-600 mt-1">Bepaalt de punten van de jokerrit.</p>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -126,7 +149,7 @@ export function JokerritForm({ rideId, initialValues }: Props) {
 
       <div className="rounded-lg bg-purple-950/30 border border-purple-800/40 p-4 text-sm text-purple-200 space-y-1">
         <p className="font-medium">🤡 Jokerrit</p>
-        <p className="text-xs text-purple-300">Telt voor 2 punten in het klassement als minstens 4 leden bevestigd aanwezig waren. Een herinneringsmail wordt automatisch 2 dagen voor de rit verstuurd.</p>
+        <p className="text-xs text-purple-300">Telt voor {DEFAULT_POINTS[form.ride_type]} punt{DEFAULT_POINTS[form.ride_type] !== 1 ? 'en' : ''} in het klassement als minstens 4 leden bevestigd aanwezig waren. Een herinneringsmail wordt automatisch 2 dagen voor de rit verstuurd.</p>
       </div>
 
       {error && (

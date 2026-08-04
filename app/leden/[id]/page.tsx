@@ -38,7 +38,7 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
 
   const { data: regData } = await supabase
     .from('ride_registrations')
-    .select(`id, attended, ride:rides(id, title, start_at, points, in_ranking, cancelled, ride_type)`)
+    .select(`id, attended, ride:rides(id, title, start_at, points, in_ranking, cancelled, ride_type, is_jokerrit)`)
     .eq('user_id', id);
 
   const ritten = (regData ?? [])
@@ -51,7 +51,7 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
     .sort((a: any, b: any) => new Date(a.ride.start_at).getTime() - new Date(b.ride.start_at).getTime());
 
   // Jokerrits tellen enkel als minstens 4 leden aanwezig waren
-  const jokerritIds = ritten.filter((r: any) => r.ride.ride_type === 'jokerrit').map((r: any) => r.ride.id);
+  const jokerritIds = ritten.filter((r: any) => r.ride.is_jokerrit).map((r: any) => r.ride.id);
   const qualifiedJokerrits = new Set<string>();
   if (jokerritIds.length > 0) {
     const { data: attended } = await supabase
@@ -148,7 +148,7 @@ export default async function LidProfielPage({ params }: { params: Promise<{ id:
                     <RatingBadge avg={ratings[r.ride.id]?.avg ?? 0} count={ratings[r.ride.id]?.count ?? 0} />
                   </div>
                   {r.ride.in_ranking && (() => {
-                    const isJokerrit = r.ride.ride_type === 'jokerrit';
+                    const isJokerrit = r.ride.is_jokerrit;
                     const pts = isJokerrit && !qualifiedJokerrits.has(r.ride.id) ? 0 : r.ride.points;
                     return pts > 0
                       ? <span className="shrink-0 text-xs text-amber-400">{pts} pt</span>
