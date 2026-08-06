@@ -1,4 +1,5 @@
 import type { NewsletterRide, NewsletterActivity, NewsletterIssue } from '@/lib/newsletter';
+import { sanitizeRichText } from '@/lib/utils';
 
 function fmtDate(iso: string): string {
   return new Intl.DateTimeFormat('nl-BE', {
@@ -88,20 +89,6 @@ function activityRow(a: NewsletterActivity, siteUrl: string): string {
         </table>
       </td>
     </tr>`;
-}
-
-/**
- * Lichte opschoning van de admin-ingevoerde introtekst (HTML uit de WYSIWYG-
- * editor). De invoer komt enkel van geauthenticeerde admins en plakken gebeurt
- * als platte tekst, dus dit dient vooral om per ongeluk gevaarlijke/ongeldige
- * constructies te weren en de mailopmaak schoon te houden.
- */
-function sanitizeIntro(html: string): string {
-  return html
-    .replace(/<\s*(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
-    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
-    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
-    .replace(/javascript:/gi, '');
 }
 
 export function buildNewsletterEmail(
@@ -212,7 +199,7 @@ export function buildNewsletterEmail(
         ${introText.replace(/<[^>]*>/g, '').trim() ? `
         <tr>
           <td style="padding:24px 32px 0;">
-            <div style="font-size:15px;color:#374151;line-height:1.75;">${sanitizeIntro(introText)}</div>
+            <div style="font-size:15px;color:#374151;line-height:1.75;">${sanitizeRichText(introText)}</div>
           </td>
         </tr>
         <tr><td style="padding:0 32px;"><div style="height:1px;background:#e5e7eb;margin:20px 0 0;"></div></td></tr>

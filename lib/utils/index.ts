@@ -121,6 +121,19 @@ export function rideTypeEmoji(type: string): string {
 export const JOKERRIT_LABEL = 'Jokerrit';
 export const JOKERRIT_EMOJI = '🤡';
 
+/**
+ * Lichte opschoning van HTML uit de WYSIWYG-editor (RichTextEditor) vóór weergave.
+ * De invoer komt enkel van geauthenticeerde admins en plakken gebeurt als platte
+ * tekst; dit weert vooral per ongeluk gevaarlijke/ongeldige constructies.
+ */
+export function sanitizeRichText(html: string): string {
+  return html
+    .replace(/<\s*(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/javascript:/gi, '');
+}
+
 export function computeReminderAt(startAtUtc: string, daysBefore: number): string {
   const d = new Date(startAtUtc);
   d.setUTCDate(d.getUTCDate() - daysBefore);

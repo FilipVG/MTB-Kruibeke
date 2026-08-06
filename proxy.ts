@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Beschermde routes
-  const protectedPaths = ['/profiel', '/klassement', '/leden', '/admin'];
+  const protectedPaths = ['/profiel', '/klassement', '/leden', '/admin', '/verslagen'];
   const adminPaths = ['/admin'];
 
   const isProtected = protectedPaths.some(p => pathname.startsWith(p));

@@ -21,6 +21,7 @@ const publicLinks: NavLink[] = [
 const memberLinks: NavLink[] = [
   { href: '/klassement', label: 'Klassement' },
   { href: '/leden', label: 'Wie is wie' },
+  { href: '/verslagen', label: 'Verslagen' },
   { href: 'https://photos.app.goo.gl/4nosNecYU9ZgdLQJA', label: "Foto's", external: true },
 ];
 

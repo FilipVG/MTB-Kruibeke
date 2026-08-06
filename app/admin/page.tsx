@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Calendar, Users, Star, Activity, Mail } from 'lucide-react';
+import { Calendar, Users, Star, Activity, Mail, FileText } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getNewsletterData } from '@/lib/newsletter';
 
@@ -7,10 +7,11 @@ export const metadata = { title: 'Admin — MTB Kruibeke' };
 
 export default async function AdminPage() {
   const supabase = await createClient();
-  const [{ count: ridesCount }, { count: membersCount }, { count: sponsorsCount }, newsletter] = await Promise.all([
+  const [{ count: ridesCount }, { count: membersCount }, { count: sponsorsCount }, { count: reportsCount }, newsletter] = await Promise.all([
     supabase.from('rides').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('sponsors').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('meeting_reports').select('*', { count: 'exact', head: true }),
     getNewsletterData(supabase),
   ]);
 
@@ -46,6 +47,14 @@ export default async function AdminPage() {
       icon: Activity,
       stat: null,
       statLabel: '',
+    },
+    {
+      href: '/admin/verslagen',
+      title: 'Verslagen beheren',
+      desc: 'Vergaderverslagen aanmaken en bewerken met een tekst-editor.',
+      icon: FileText,
+      stat: reportsCount,
+      statLabel: 'Verslagen',
     },
     {
       href: '/admin/nieuwsbrief',

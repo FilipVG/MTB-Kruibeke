@@ -84,6 +84,18 @@ export interface Sponsor {
   created_at: string;
 }
 
+export interface MeetingReport {
+  id: string;
+  title: string;
+  meeting_date: string;
+  content: string;
+  attachment_url: string | null;
+  published: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface RankingEntry {
   id: string;
   nickname: string | null;
