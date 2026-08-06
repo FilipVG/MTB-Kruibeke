@@ -17,6 +17,7 @@ export interface Profile {
   is_active: boolean;
   email_reminders: boolean;
   review_reminders: boolean;
+  report_notifications: boolean;
   wants_newsletter: boolean;
   last_seen_at: string | null;
   created_at: string;
@@ -92,6 +93,7 @@ export interface MeetingReport {
   content: string;
   attachment_url: string | null;
   published: boolean;
+  notified_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

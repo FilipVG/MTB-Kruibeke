@@ -1,0 +1,105 @@
+interface ReportInfo {
+  id: string;
+  title: string;
+  meeting_date: string;
+}
+
+function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat('nl-BE', {
+    timeZone: 'UTC',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
+/**
+ * Melding aan de leden dat er een nieuw vergaderverslag gepubliceerd is.
+ * De knop linkt naar het verslag in de ledenzone (achter login).
+ */
+export function buildReportPublishedEmail(
+  report: ReportInfo,
+  siteUrl: string,
+): { subject: string; html: string } {
+  const url = `${siteUrl}/verslagen/${report.id}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:#b91c1c;padding:28px 32px;">
+            <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.7);letter-spacing:0.15em;text-transform:uppercase;">Mountainbike club · Waasland</p>
+            <h1 style="margin:6px 0 0;font-size:26px;font-weight:700;color:#ffffff;">MTB Kruibeke</h1>
+          </td>
+        </tr>
+
+        <!-- Intro -->
+        <tr>
+          <td style="padding:32px 32px 0;">
+            <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1a1a1a;">📋 Nieuw verslag</h2>
+            <p style="margin:0;font-size:15px;color:#555;line-height:1.6;">
+              Er staat een nieuw vergaderverslag online.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Verslag-kaart -->
+        <tr>
+          <td style="padding:24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;">
+              <tr>
+                <td style="padding:20px;">
+                  <p style="margin:0;font-size:18px;font-weight:700;color:#1a1a1a;">${report.title}</p>
+                  <p style="margin:4px 0 0;font-size:14px;color:#666;text-transform:capitalize;">${formatDate(report.meeting_date)}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:0 32px 8px;text-align:center;">
+            <a href="${url}" style="display:inline-block;background:#b91c1c;color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;padding:14px 36px;border-radius:8px;">
+              Bekijk het verslag →
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 28px;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#999;">Je moet ingelogd zijn op mtbkruibeke.be om het verslag te bekijken.</p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:20px 32px;text-align:center;">
+            <p style="margin:0 0 6px;font-size:12px;color:#999;">
+              Je ontvangt deze mail omdat je verslag-meldingen hebt ingeschakeld.
+            </p>
+            <p style="margin:0;font-size:12px;color:#999;">
+              <a href="${siteUrl}/profiel" style="color:#b91c1c;text-decoration:none;">Voorkeuren wijzigen</a>
+              &nbsp;·&nbsp;
+              <a href="${siteUrl}" style="color:#b91c1c;text-decoration:none;">mtbkruibeke.be</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  return {
+    subject: `📋 Nieuw verslag: ${report.title}`,
+    html,
+  };
+}

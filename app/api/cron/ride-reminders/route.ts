@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendRideEmails } from '@/lib/email/send-ride-emails';
 import { buildAttendanceReminderEmail } from '@/lib/email/attendance-reminder';
+import { buildReportPublishedEmail } from '@/lib/email/report-published';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,10 +95,49 @@ export async function GET(request: Request) {
     }
   }
 
+  // ── 3. Nieuw gepubliceerde verslagen aankondigen aan de leden ───────
+  // Verslagen die gepubliceerd zijn maar nog niet gemeld (notified_at IS NULL).
+  let reportMailsSent = 0;
+  const { data: newReports } = await supabase
+    .from('meeting_reports')
+    .select('id, title, meeting_date')
+    .eq('published', true)
+    .is('notified_at', null);
+
+  if (newReports && newReports.length > 0) {
+    const { data: reportRecipients } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('is_active', true)
+      .eq('report_notifications', true)
+      .not('email', 'is', null);
+
+    const reportEmails = (reportRecipients ?? []).map((r: any) => r.email as string).filter(Boolean);
+
+    for (const report of newReports) {
+      if (reportEmails.length > 0) {
+        const { subject, html } = buildReportPublishedEmail(report, siteUrl);
+        const emails = reportEmails.map((to) => ({ from, to, subject, html }));
+        for (let i = 0; i < emails.length; i += 50) {
+          await resend.batch.send(emails.slice(i, i + 50));
+        }
+        reportMailsSent += reportEmails.length;
+      }
+      // Altijd markeren als gemeld — ook zonder ontvangers — zodat dit verslag
+      // niet elke run opnieuw opgehaald wordt.
+      await supabase
+        .from('meeting_reports')
+        .update({ notified_at: new Date().toISOString() })
+        .eq('id', report.id);
+    }
+  }
+
   return NextResponse.json({
     invitesSent,
     rides: rides?.length ?? 0,
     attendanceMailsSent,
     ridesPendingConfirmation: pendingRides.length,
+    reportsPublished: newReports?.length ?? 0,
+    reportMailsSent,
   });
 }
