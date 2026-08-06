@@ -88,6 +88,7 @@ export interface MeetingReport {
   id: string;
   title: string;
   meeting_date: string;
+  attendees: string | null;
   content: string;
   attachment_url: string | null;
   published: boolean;

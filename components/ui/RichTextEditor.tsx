@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Bold, Italic, List, ListOrdered, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,16 @@ interface Props {
  */
 export function RichTextEditor({ initialHtml = '', onChange, placeholder = 'Schrijf hier…', className }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Begininhoud één keer imperatief zetten. Bewust GEEN dangerouslySetInnerHTML:
+  // dat zou de editor bij elke re-render (bv. door onChange in het formulier)
+  // resetten, waardoor typen onmogelijk wordt. Zo beheert de browser de inhoud.
+  useEffect(() => {
+    if (editorRef.current && initialHtml) {
+      editorRef.current.innerHTML = initialHtml;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function emit() {
     onChange(editorRef.current?.innerHTML ?? '');
@@ -86,7 +96,6 @@ export function RichTextEditor({ initialHtml = '', onChange, placeholder = 'Schr
         className={cn('rte-editor input min-h-[180px] max-h-[520px] overflow-auto leading-relaxed', className)}
         onInput={emit}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ __html: initialHtml }}
       />
       <p className="text-xs text-ink-500 mt-1">Selecteer tekst en klik op een knop om op te maken. Plakken gebeurt als platte tekst.</p>
     </div>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Paperclip } from 'lucide-react';
+import { ArrowLeft, Paperclip, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { sanitizeRichText } from '@/lib/utils';
 import type { MeetingReport } from '@/lib/types/database';
@@ -44,6 +44,15 @@ export default async function VerslagDetailPage({ params }: { params: Promise<{ 
           <Paperclip className="h-4 w-4" />
           Bijlage openen
         </a>
+      )}
+
+      {r.attendees && r.attendees.trim() && (
+        <div className="card p-4 mt-6">
+          <p className="text-xs font-medium text-ink-500 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5" /> Aanwezigen
+          </p>
+          <p className="text-sm text-ink-200 whitespace-pre-wrap">{r.attendees}</p>
+        </div>
       )}
 
       <div className="card p-6 sm:p-8 mt-6">

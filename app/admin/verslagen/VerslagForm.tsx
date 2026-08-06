@@ -18,6 +18,7 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
 
   const [title, setTitle] = useState(report?.title ?? '');
   const [meetingDate, setMeetingDate] = useState(report?.meeting_date ?? todayISO());
+  const [attendees, setAttendees] = useState(report?.attendees ?? '');
   const [content, setContent] = useState(report?.content ?? '');
   const [published, setPublished] = useState(report?.published ?? true);
   const [attachmentUrl, setAttachmentUrl] = useState<string | null>(report?.attachment_url ?? null);
@@ -43,7 +44,7 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
       attachment_url = supabase.storage.from('verslagen').getPublicUrl(path).data.publicUrl;
     }
 
-    const values = { title, meeting_date: meetingDate, content, published, attachment_url };
+    const values = { title, meeting_date: meetingDate, attendees: attendees || null, content, published, attachment_url };
 
     if (isEdit) {
       const { error: err } = await supabase.from('meeting_reports').update(values).eq('id', report!.id);
@@ -78,6 +79,16 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
             <input required type="date" className="input" value={meetingDate}
               onChange={e => setMeetingDate(e.target.value)} />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm text-ink-200 mb-1.5">Aanwezigen</label>
+          <textarea
+            className="input min-h-[70px]"
+            value={attendees}
+            placeholder="bv. Jan, Piet, Marie, …"
+            onChange={e => setAttendees(e.target.value)}
+          />
         </div>
 
         <div>
