@@ -95,8 +95,22 @@ export interface MeetingReport {
   published: boolean;
   notified_at: string | null;
   created_by: string | null;
+  updated_by: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface MeetingReportRevision {
+  id: string;
+  report_id: string;
+  edited_by: string | null;
+  edited_at: string;
+  title: string;
+  meeting_date: string;
+  attendees: string | null;
+  content: string;
+  published: boolean;
+  attachment_url: string | null;
 }
 
 export interface RankingEntry {
