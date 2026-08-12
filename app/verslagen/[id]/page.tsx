@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, Paperclip, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { sanitizeRichText } from '@/lib/utils';
+import { MarkReportRead } from '@/components/verslagen/MarkReportRead';
 import type { MeetingReport } from '@/lib/types/database';
 
 function fmtDate(iso: string): string {
@@ -26,6 +27,7 @@ export default async function VerslagDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12">
+      <MarkReportRead reportId={r.id} />
       <Link href="/verslagen" className="text-sm text-ink-400 hover:text-white inline-flex items-center gap-1 mb-6">
         <ArrowLeft className="h-4 w-4" />
         Alle verslagen

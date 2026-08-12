@@ -100,6 +100,14 @@ export interface MeetingReport {
   updated_at: string;
 }
 
+export interface MeetingReportRead {
+  report_id: string;
+  user_id: string;
+  first_opened_at: string;
+  last_opened_at: string;
+  open_count: number;
+}
+
 export interface MeetingReportRevision {
   id: string;
   report_id: string;
