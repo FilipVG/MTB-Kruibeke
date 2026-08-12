@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Trash2, Paperclip } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import type { MeetingReport } from '@/lib/types/database';
@@ -25,7 +25,6 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,13 +53,6 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
       const { error: err } = await supabase.from('meeting_reports').insert({ ...values, created_by: user?.id ?? null });
       if (err) { setError(err.message); setSaving(false); return; }
     }
-    router.push('/admin/verslagen');
-    router.refresh();
-  }
-
-  async function handleDelete() {
-    if (!report) return;
-    await supabase.from('meeting_reports').delete().eq('id', report.id);
     router.push('/admin/verslagen');
     router.refresh();
   }
@@ -129,26 +121,6 @@ export function VerslagForm({ report }: { report?: MeetingReport }) {
           </button>
         </div>
       </div>
-
-      {isEdit && (
-        <div className="card p-6 border-red-900/40">
-          <h2 className="font-semibold text-white mb-3 flex items-center gap-2">
-            <Trash2 className="h-4 w-4 text-red-400" /> Verslag verwijderen
-          </h2>
-          {!confirmDelete ? (
-            <button type="button" onClick={() => setConfirmDelete(true)}
-              className="btn-secondary border-red-900/60 text-red-400 hover:bg-red-950/40">
-              <Trash2 className="h-4 w-4" /> Verwijderen
-            </button>
-          ) : (
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="text-sm text-red-300">Zeker?</p>
-              <button type="button" onClick={handleDelete} className="btn-primary bg-red-700 hover:bg-red-600">Ja, verwijderen</button>
-              <button type="button" onClick={() => setConfirmDelete(false)} className="btn-secondary">Annuleren</button>
-            </div>
-          )}
-        </div>
-      )}
     </form>
   );
 }

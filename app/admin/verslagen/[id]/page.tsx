@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { VerslagForm } from '../VerslagForm';
 import { RevisionHistory } from '@/components/verslagen/RevisionHistory';
 import { ReadReceipts } from '@/components/verslagen/ReadReceipts';
+import { VerslagDelete } from '@/components/verslagen/VerslagDelete';
 import type { MeetingReport } from '@/lib/types/database';
 
 export const metadata = { title: 'Verslag bewerken — Admin' };
@@ -31,6 +32,7 @@ export default async function BewerkVerslagPage({ params }: { params: Promise<{ 
       <VerslagForm report={data as MeetingReport} />
       <ReadReceipts reads={(reads ?? []) as any} totalMembers={totalMembers ?? 0} />
       <RevisionHistory revisions={(revisions ?? []) as any} />
+      <VerslagDelete reportId={data.id} />
     </div>
   );
 }
