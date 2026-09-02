@@ -21,6 +21,7 @@ export default function NieuweRitPage() {
     in_ranking: true,
     points: 2,
     is_jokerrit: false,
+    send_review_reminder: true,
   });
   const [sendReminder, setSendReminder] = useState(true);
   const [daysBefore, setDaysBefore] = useState(2);
@@ -136,6 +137,16 @@ export default function NieuweRitPage() {
               <span className="text-xs text-ink-500">(0 = de dag zelf)</span>
             </div>
           )}
+          <label className="flex items-center gap-2 mt-3">
+            <input
+              type="checkbox"
+              checked={form.send_review_reminder}
+              onChange={e => setForm({ ...form, send_review_reminder: e.target.checked })}
+              className="rounded border-ink-700 bg-ink-900 text-brand-700 focus:ring-brand-500"
+            />
+            <span className="text-sm text-ink-200">Review-mail versturen na de rit</span>
+          </label>
+          <p className="text-xs text-ink-500 mt-1">Reviews blijven altijd mogelijk op de site; dit stuurt enkel de herinneringsmail aan/uit.</p>
         </div>
 
         <div>

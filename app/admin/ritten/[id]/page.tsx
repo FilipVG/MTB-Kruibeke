@@ -35,6 +35,7 @@ interface Ride {
   in_ranking: boolean;
   points: number;
   is_jokerrit: boolean;
+  send_review_reminder: boolean;
   registration_open: boolean;
   cancelled: boolean;
   reminder_at: string | null;
@@ -81,6 +82,7 @@ export default function RitBeheerPage() {
           in_ranking: r.in_ranking,
           points: r.points,
           is_jokerrit: r.is_jokerrit,
+          send_review_reminder: r.send_review_reminder ?? true,
           registration_open: r.registration_open,
           cancelled: r.cancelled,
           reminder_at: r.reminder_at,
@@ -333,6 +335,10 @@ export default function RitBeheerPage() {
             <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer">
               <input type="checkbox" checked={form.is_jokerrit} onChange={e => setForm({ ...form, is_jokerrit: e.target.checked })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
               🤡 Jokerrit
+            </label>
+            <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer" title="Reviews blijven mogelijk; enkel de herinneringsmail wordt aan/uit gezet.">
+              <input type="checkbox" checked={form.send_review_reminder} onChange={e => setForm({ ...form, send_review_reminder: e.target.checked })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />
+              Review-mail versturen
             </label>
             <label className="flex items-center gap-2 text-sm text-ink-200 cursor-pointer">
               <input type="checkbox" checked={form.registration_open} onChange={e => setForm({ ...form, registration_open: e.target.checked })} className="rounded border-ink-700 bg-ink-900 text-brand-700" />

@@ -7,7 +7,9 @@ import type { Ride, Sponsor, RegistrationWithProfile } from '@/lib/types/databas
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // Een rit blijft nog tot 6u na de start op de homepage staan (met reviewknop);
+  // daarna valt hij weg (de deelnemers krijgen sowieso een review-mail).
+  const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
 
   // Profiel + ritten + sponsors zijn onderling onafhankelijk: parallel ophalen.
   const [current, { data: upcomingRides }, { data: sponsors }] = await Promise.all([
@@ -15,7 +17,7 @@ export default async function HomePage() {
     supabase
       .from('rides')
       .select(`*, registrations:ride_registrations(id, user_id, profile:profiles(id, nickname, first_name, last_name, avatar_url))`)
-      .gte('start_at', oneDayAgo)
+      .gte('start_at', sixHoursAgo)
       .eq('cancelled', false)
       .order('start_at', { ascending: true })
       .limit(3),

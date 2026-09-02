@@ -31,6 +31,7 @@ export async function GET(request: Request) {
     .lte('start_at', eightHoursAgo)
     .gte('start_at', fortyEightHoursAgo)
     .eq('cancelled', false)
+    .eq('send_review_reminder', true)
     .is('review_reminder_sent_at', null);
 
   let reviewMailsSent = 0;

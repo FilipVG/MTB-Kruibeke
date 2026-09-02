@@ -45,6 +45,7 @@ export interface Ride {
   reminder_at: string | null;
   reminder_sent_at: string | null;
   review_reminder_sent_at: string | null;
+  send_review_reminder: boolean;
   created_at: string;
   updated_at: string;
 }
