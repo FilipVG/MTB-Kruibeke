@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Trophy, Download, Users, Check, X, Star } from 'lucide-react';
 import { formatRideDate, isRegistrationOpen, getDisplayName, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
+import { setRideRegistration } from '@/lib/registrations';
 import { RatingBadge } from './RatingBadge';
 import type { Profile } from '@/lib/types/database';
 
@@ -38,7 +38,7 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
-  const supabase = createClient();
+  const [message, setMessage] = useState<string | null>(null);
 
   const canRegister = isRegistrationOpen(ride);
   const isRegistered = ride.is_registered;
@@ -50,17 +50,13 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
       return;
     }
     if (isRegistered && !window.confirm('Wil je je uitschrijven voor deze rit?')) return;
+    setMessage(null);
     startTransition(async () => {
-      if (isRegistered) {
-        await supabase
-          .from('ride_registrations')
-          .delete()
-          .eq('ride_id', ride.id)
-          .eq('user_id', currentUserId);
-      } else {
-        await supabase
-          .from('ride_registrations')
-          .insert({ ride_id: ride.id, user_id: currentUserId });
+      const result = await setRideRegistration(ride.id, !isRegistered);
+      if (!result.ok) {
+        setMessage(result.error);
+        if (result.needsLogin) router.push('/auth/login?redirect=/kalender');
+        return;
       }
       router.refresh();
     });
@@ -168,6 +164,8 @@ export function RideListItem({ ride, currentUserId, isAdmin }: Props) {
             )}
           </div>
         </div>
+
+        {message && <p className="mt-2 text-sm text-red-400">{message}</p>}
 
         <button
           onClick={() => setExpanded(!expanded)}

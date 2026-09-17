@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, MapPin, Users, Check, PartyPopper } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { setActivityRegistration } from '@/lib/registrations';
 import { cn } from '@/lib/utils';
 import type { Activity } from '@/lib/types/database';
 
@@ -29,7 +29,7 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
-  const supabase = createClient();
+  const [message, setMessage] = useState<string | null>(null);
 
   async function toggleRegistration() {
     if (!currentUserId) {
@@ -37,17 +37,13 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
       return;
     }
     if (activity.is_registered && !window.confirm('Wil je je uitschrijven voor deze activiteit?')) return;
+    setMessage(null);
     startTransition(async () => {
-      if (activity.is_registered) {
-        await supabase
-          .from('activity_registrations')
-          .delete()
-          .eq('activity_id', activity.id)
-          .eq('user_id', currentUserId);
-      } else {
-        await supabase
-          .from('activity_registrations')
-          .insert({ activity_id: activity.id, user_id: currentUserId });
+      const result = await setActivityRegistration(activity.id, !activity.is_registered);
+      if (!result.ok) {
+        setMessage(result.error);
+        if (result.needsLogin) router.push('/auth/login?redirect=/kalender');
+        return;
       }
       router.refresh();
     });
@@ -137,6 +133,8 @@ export function ActivityListItem({ activity, currentUserId, isAdmin }: Props) {
             </div>
           )}
         </div>
+
+        {message && <p className="mt-2 text-sm text-red-400">{message}</p>}
 
         {(activity.description || isAdmin) && (
           <button

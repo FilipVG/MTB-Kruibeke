@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { RefreshOnFocus } from '@/components/ui/RefreshOnFocus';
 import { getCurrentUser } from '@/lib/supabase/server';
 import './globals.css';
 
@@ -26,6 +27,7 @@ export default async function RootLayout({
   return (
     <html lang="nl" className={inter.variable}>
       <body className="min-h-screen flex flex-col">
+        <RefreshOnFocus />
         <Header profile={current?.profile ?? null} />
         <main className="flex-1">{children}</main>
         <Footer />

@@ -1,11 +1,11 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, MapPin, Trophy, Users, Check, Star } from 'lucide-react';
 import { formatRideDate, cn, rideTypeBadge, rideTypeLabel } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
+import { setRideRegistration } from '@/lib/registrations';
 import type { Profile } from '@/lib/types/database';
 
 interface Props {
@@ -30,7 +30,7 @@ interface Props {
 export function RideCardCompact({ ride, currentUserId }: Props) {
   const [pending, startTransition] = useTransition();
   const router = useRouter();
-  const supabase = createClient();
+  const [message, setMessage] = useState<string | null>(null);
 
   async function toggleRegistration(e: React.MouseEvent) {
     e.preventDefault();
@@ -39,12 +39,13 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
       return;
     }
     if (ride.is_registered && !window.confirm('Wil je je uitschrijven voor deze rit?')) return;
+    setMessage(null);
     startTransition(async () => {
-      if (ride.is_registered) {
-        await supabase.from('ride_registrations').delete()
-          .eq('ride_id', ride.id).eq('user_id', currentUserId);
-      } else {
-        await supabase.from('ride_registrations').insert({ ride_id: ride.id, user_id: currentUserId });
+      const result = await setRideRegistration(ride.id, !ride.is_registered);
+      if (!result.ok) {
+        setMessage(result.error);
+        if (result.needsLogin) router.push('/auth/login?redirect=/');
+        return;
       }
       router.refresh();
     });
@@ -155,6 +156,8 @@ export function RideCardCompact({ ride, currentUserId }: Props) {
           {ride.is_registered ? <><Check className="h-3.5 w-3.5" /> Ingeschreven</> : 'Ik kom af!'}
         </button>
       )}
+
+      {message && <p className="text-xs text-red-400">{message}</p>}
     </div>
   );
 }
