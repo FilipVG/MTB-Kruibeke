@@ -157,8 +157,10 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
           </a>
         )}
 
-        {/* Inschrijfknop */}
-        {!ride.cancelled && (
+        {/* Inschrijfknop — niet meer tonen zodra de rit voorbij is. "Inschrijvingen
+            zijn gesloten" leidde anders tot verwarring bij wie via de review-mail
+            op deze pagina belandt: dat leest als "de rit is afgesloten". */}
+        {!ride.cancelled && !isPastRide && (
           <div className="border-t border-ink-800 pt-5">
             <RegistrationButton
               rideId={ride.id}
@@ -170,6 +172,23 @@ export default async function RitDetailPage({ params }: { params: Promise<{ id: 
           </div>
         )}
       </div>
+
+      {/* Niet ingelogd op een afgelopen rit: de reviewsectie bleef anders volledig
+          onzichtbaar. Wie via de review-mail komt, ziet nu meteen wat te doen.
+          Het id="reviews" houdt de anchor uit de mail werkend. */}
+      {isPastRide && !current && (
+        <div id="reviews" className="card p-6 mt-4 text-center">
+          <p className="text-sm text-ink-300">
+            Log in om een review achter te laten voor deze rit.
+          </p>
+          <Link
+            href={`/auth/login?redirect=${encodeURIComponent(`/kalender/${id}#reviews`)}`}
+            className="btn-primary mt-4 inline-flex"
+          >
+            Inloggen
+          </Link>
+        </div>
+      )}
 
       {/* Reviews — enkel voor afgelopen ritten, zichtbaar voor ingelogde leden */}
       {current && isPastRide && (
