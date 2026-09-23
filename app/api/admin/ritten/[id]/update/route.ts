@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { requireAdmin } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { buildRideUpdateEmail } from '@/lib/email/ride-update';
+import { MAIL_FROM, REPLY_TO } from '@/lib/email/config';
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -11,7 +12,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   const admin = createAdminClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtbkruibeke.be';
-  const from = process.env.RESEND_FROM ?? 'MTB Kruibeke <noreply@mtbkruibeke.be>';
+  const from = MAIL_FROM;
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   const { data: ride } = await admin.from('rides').select('*').eq('id', id).single();
@@ -36,7 +37,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   const { subject, html } = buildRideUpdateEmail(ride, siteUrl);
 
-  const emails = recipients.map((to) => ({ from, to, subject, html }));
+  const emails = recipients.map((to) => ({ from, to, replyTo: REPLY_TO, subject, html }));
   for (let i = 0; i < emails.length; i += 50) {
     await resend.batch.send(emails.slice(i, i + 50));
   }

@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendRideEmails } from '@/lib/email/send-ride-emails';
 import { buildAttendanceReminderEmail } from '@/lib/email/attendance-reminder';
 import { buildReportPublishedEmail } from '@/lib/email/report-published';
+import { MAIL_FROM, REPLY_TO } from '@/lib/email/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
   const supabase = createAdminClient();
   const resend = new Resend(process.env.RESEND_API_KEY);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtbkruibeke.be';
-  const from = process.env.RESEND_FROM ?? 'MTB Kruibeke <noreply@mtbkruibeke.be>';
+  const from = MAIL_FROM;
   const nowIso = new Date().toISOString();
 
   // ── 1. Rituitnodigingen ─────────────────────────────────────────────
@@ -87,7 +88,7 @@ export async function GET(request: Request) {
     const adminEmails = (admins ?? []).map((a: any) => a.email as string);
     if (adminEmails.length > 0) {
       const { subject, html } = buildAttendanceReminderEmail(pendingRides, siteUrl);
-      const emails = adminEmails.map((to) => ({ from, to, subject, html }));
+      const emails = adminEmails.map((to) => ({ from, to, replyTo: REPLY_TO, subject, html }));
       for (let i = 0; i < emails.length; i += 50) {
         await resend.batch.send(emails.slice(i, i + 50));
       }
@@ -117,7 +118,7 @@ export async function GET(request: Request) {
     for (const report of newReports) {
       if (reportEmails.length > 0) {
         const { subject, html } = buildReportPublishedEmail(report, siteUrl);
-        const emails = reportEmails.map((to) => ({ from, to, subject, html }));
+        const emails = reportEmails.map((to) => ({ from, to, replyTo: REPLY_TO, subject, html }));
         for (let i = 0; i < emails.length; i += 50) {
           await resend.batch.send(emails.slice(i, i + 50));
         }

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { buildRideReminderEmail } from './ride-reminder';
+import { REPLY_TO } from '@/lib/email/config';
 
 interface Member {
   id: string;
@@ -46,7 +47,7 @@ export async function sendRideEmails(
   const emails = members.map((m) => {
     const isRegistered = registeredIds.has(m.id);
     const { subject, html } = buildRideReminderEmail(ride as any, top3, siteUrl, isRegistered, registeredNames);
-    return { from, to: m.email, subject, html };
+    return { from, to: m.email, replyTo: REPLY_TO, subject, html };
   });
 
   // Verstuur in batches van 50 (Resend limiet)

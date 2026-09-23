@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getNewsletterData, getNextIssueNumber } from '@/lib/newsletter';
 import { buildNewsletterEmail } from '@/lib/email/newsletter';
+import { MAIL_FROM, REPLY_TO } from '@/lib/email/config';
 
 export async function POST(request: Request) {
   const authResult = await requireAdmin();
@@ -46,11 +47,11 @@ export async function POST(request: Request) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = 'MTB Kruibeke <no-reply@mtbkruibeke.be>';
+  const from = MAIL_FROM;
 
   let totalSent = 0;
   for (let i = 0; i < emails.length; i += 50) {
-    const batch = emails.slice(i, i + 50).map(to => ({ from, to, subject, html }));
+    const batch = emails.slice(i, i + 50).map(to => ({ from, to, replyTo: REPLY_TO, subject, html }));
     await resend.batch.send(batch);
     totalSent += batch.length;
   }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { buildReviewReminderEmail } from '@/lib/email/review-reminder';
+import { MAIL_FROM, REPLY_TO } from '@/lib/email/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
   const supabase = createAdminClient();
   const resend = new Resend(process.env.RESEND_API_KEY);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mtbkruibeke.be';
-  const from = process.env.RESEND_FROM ?? 'MTB Kruibeke <noreply@mtbkruibeke.be>';
+  const from = MAIL_FROM;
 
   const now = Date.now();
   // Ritten die minstens 8u geleden gestart zijn, maar niet ouder dan 48u.
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
 
     if (recipients.length > 0) {
       const { subject, html } = buildReviewReminderEmail(ride, siteUrl);
-      const emails = recipients.map((p) => ({ from, to: p.email, subject, html }));
+      const emails = recipients.map((p) => ({ from, to: p.email, replyTo: REPLY_TO, subject, html }));
       for (let i = 0; i < emails.length; i += 50) {
         await resend.batch.send(emails.slice(i, i + 50));
       }

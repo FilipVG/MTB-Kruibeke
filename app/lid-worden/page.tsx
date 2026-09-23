@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Check, Calendar, Users, Trophy, ShieldCheck } from 'lucide-react';
+import { CONTACT_EMAIL } from '@/lib/email/config';
 
 export const metadata = { title: 'Lid worden — MTB Kruibeke' };
 
@@ -57,7 +58,7 @@ export default function LidWordenPage() {
           Of kom gewoon eens een keer mee rijden — kijk op de kalender wanneer de volgende rit is.
         </p>
         <div className="flex flex-wrap gap-3">
-          <a href="mailto:mtbkruibeke.unlit879@passmail.net" className="btn-primary">
+          <a href={`mailto:${CONTACT_EMAIL}`} className="btn-primary">
             Stuur een e-mail
           </a>
           <Link href="/kalender" className="btn-secondary">
