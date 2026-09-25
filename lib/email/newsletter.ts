@@ -101,36 +101,6 @@ export function buildNewsletterEmail(
 ): { subject: string; html: string } {
   const editie = `${issue.year} nr ${issue.number}`;
   const titel = testMode ? 'TEST Off-Road Update' : 'Off-Road Update';
-  const changedItems = [...rides, ...activities]
-    .filter(i => i.status !== 'existing')
-    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
-
-  const changedSection = changedItems.length > 0 ? `
-        <tr>
-          <td style="padding:28px 32px 0;">
-            <h2 style="margin:0 0 14px;font-size:14px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.1em;">
-              Wat is er nieuw?
-            </h2>
-            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#f9fafb;">
-              ${changedItems.map(item => {
-                const isRide = 'ride_type' in item;
-                const link = isRide
-                  ? `${siteUrl}/kalender/${item.id}`
-                  : `${siteUrl}/kalender/activiteiten/${item.id}`;
-                return `<tr>
-                  <td style="padding:10px 16px;border-bottom:1px solid #e5e7eb;">
-                    ${statusBadge(item.status)}
-                    &nbsp;<a href="${link}" style="font-size:14px;font-weight:600;color:#111827;text-decoration:none;">${item.title}</a>
-                    <span style="font-size:13px;color:#9ca3af;">&nbsp;—&nbsp;<span style="text-transform:capitalize;">${fmtDate(item.start_at)}</span></span>
-                  </td>
-                </tr>`;
-              }).join('')}
-            </table>
-          </td>
-        </tr>
-        <tr><td style="padding:0 32px;"><div style="height:1px;background:#e5e7eb;margin:24px 0 0;"></div></td></tr>
-  ` : '';
-
   const ridesSection = rides.length > 0 ? `
         <tr>
           <td style="padding:24px 32px 0;">
@@ -204,7 +174,6 @@ export function buildNewsletterEmail(
         </tr>
         <tr><td style="padding:0 32px;"><div style="height:1px;background:#e5e7eb;margin:20px 0 0;"></div></td></tr>
         ` : ''}
-        ${changedSection}
         ${activitiesSection}
         ${ridesSection}
         ${emptySection}
@@ -245,9 +214,10 @@ export function buildNewsletterEmail(
 </body>
 </html>`;
 
-  const subject = changedItems.length === 1
-    ? `📬 ${titel} ${editie} — ${changedItems[0].title}`
-    : `📬 ${titel} ${editie} — ${changedItems.length} nieuwe items op de agenda`;
+  // De agenda zelf is de inhoud van de mail; het onderwerp telt dus de ritten.
+  const subject = rides.length === 1
+    ? `📬 ${titel} ${editie} — ${rides[0].title}`
+    : `📬 ${titel} ${editie} — ${rides.length} ritten op de agenda`;
 
   return { subject, html };
 }
